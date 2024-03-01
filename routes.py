@@ -15,13 +15,27 @@ def new():
     shopping_lists.new()
     return redirect("/list")
 
-@app.route("/add_item", methods=(["POST"]))
+@app.route("/add_item", methods=["POST"])
 def add_item():
     content = request.form["content"]
     if shopping_lists.add_item(content):
         return render_template("list.html", items = shopping_lists.get_items())
     else:
         return  render_template("error.html", message="Tuotteen lisääminen ei onnistunut")
+    
+@app.route("/removal_mode", methods=["POST"])
+def removal_mode():
+    return render_template("remove.html", items = shopping_lists.get_items())
+
+@app.route("/confirm_removals", methods=["POST"])
+def confirm_removals():
+    # Puts the ids of removed items into a list and calls remove_items()
+    removed_item_ids_string = request.form.get('removedItems')
+    if removed_item_ids_string != "":
+        removed_item_ids = [int(x) for x in removed_item_ids_string.split(",")]
+        shopping_lists.remove_items(removed_item_ids)
+
+    return render_template("list.html", items = shopping_lists.get_items())
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -55,3 +69,6 @@ def register():
         else:
             return render_template("error.html", message="Rekisteröinti ei onnistunut")
         
+@app.route("/home")
+def home():
+    return redirect("/")
