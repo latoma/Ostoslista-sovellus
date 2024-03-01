@@ -1,56 +1,18 @@
+<a href="/home"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
 <form action="/add_item" method="post">
+    <br>
     Kirjoita tuote ja määrä: <br>
     <textarea name="content" rows="1" cols="40"></textarea>
     <br>
-    <input id="submitButton" type="submit" value="Lisää">
-    <input id="deleteItemsButton" type="button" value="Poista tuotteita" onclick="toggleButtons()">
-    <input id="continueAddingButton" type="button" value="Jatka tuotteiden lisäämistä" style="display: none; background-color: green;" onclick="toggleButtons()">
+    <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
+    
     <ul>
         {% for item in items %}
-            <li>{{ item.item_desc }} <button class="deleteBtn" type="submit" name="delete_item" value="{{ item.item_id }}" style="display: none; color:red">X</button> </li>
+            <li>{{ item.item_desc }}</li>
         {% endfor %}
     </ul>
+    <button id="removeItemsButton" formaction="/removal_mode" style="background-color: red;"> Poista tuotteita </button>
+
+    
     </form>
-
-    <script>
-        // When "Poista tuotteita" is clicked, it adds deletion-buttons next to the items.
-        // Also, a continuation button is showed and the submit button is hidden.
-        // When continuation button is clicked, it toggles back to initial state
-        function toggleButtons() {
-            var deleteItemsButton = document.getElementById("deleteItemsButton");
-            var continueAddingButton = document.getElementById("continueAddingButton");
-            var submitButton = document.getElementById("submitButton");
-            var deleteButtons = document.getElementsByClassName("deleteBtn");
-            
-            if (deleteItemsButton.style.display === "inline-block") {
-                submitButton.style.display = "none";
-                deleteItemsButton.style.display = "none";
-                continueAddingButton.style.display = "inline-block";
-                
-                for (var i = 0; i < deleteButtons.length; i++) {
-                    deleteButtons[i].style.display = "inline-block";
-                }
-            } else {
-                submitButton.style.display = "inline-block";
-                deleteItemsButton.style.display = "inline-block";
-                continueAddingButton.style.display = "none";
-
-                for (var i = 0; i < deleteButtons.length; i++) {
-                    deleteButtons[i].style.display = "none";
-                }
-            }
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialize button elements
-            var submitButton = document.getElementById("submitButton");
-            var deleteButton = document.getElementById("deleteButton");
-            var continueButton = document.getElementById("continueButton");
-            var deleteButtons = document.getElementsByClassName("deleteBtn");
-
-            // Show submit and delete buttons, hide continue button and delete item buttons
-            submitButton.style.display = deleteButton.style.display = "inline-block";
-            continueButton.style.display = "none";
-            Array.from(deleteButtons).forEach(button => button.style.display = "none");
-        });
-
-    </script>
+    
