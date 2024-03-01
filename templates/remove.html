@@ -1,0 +1,32 @@
+<!-- remove.html -->
+<form id="removeForm" action="/confirm_removals" method="POST">
+    <ul id="itemList">
+        {% for item in items %}
+            <li data-item-id="{{ item.item_id }}">
+                {{ item.item_desc }}
+                <button class="removeButton" type="button">Poista</button>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Hidden input field to store removed item IDs -->
+    <input type="hidden" id="removedItems" name="removedItems">
+
+    <button type="submit" id="confirmButton" class="confirmButton">Vahvista</button>
+</form>
+
+<script>
+
+    // Removes item from list, stores its id into hidden input
+    document.addEventListener("DOMContentLoaded", function() {
+        const removedItemsInput = document.getElementById("removedItems");
+
+        document.querySelectorAll(".removeButton").forEach(button => {
+            button.addEventListener("click", event => {
+                const itemId = event.target.parentElement.getAttribute("data-item-id");
+                event.target.parentElement.remove();
+                removedItemsInput.value += (removedItemsInput.value ? "," : "") + itemId;
+            });
+        });
+    });
+</script>
