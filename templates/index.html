@@ -1,6 +1,10 @@
 Tervetuloa kauppalista-sovellukseen!
 {% if session.user_id %}
 Olet kirjautunut sisään.
+<form action="/new" method="post">
+    <input type="submit" value="Aloita uusi ostoslista">
+</form>
+
 <a href="/logout">Kirjaudu ulos</a>
 {% else %}
 <a href="/login">Kirjaudu sisään</a>
