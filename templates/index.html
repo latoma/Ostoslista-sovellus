@@ -7,12 +7,18 @@ Olet kirjautunut sisään.
 Kauppalistat:
 <ul>
     {% for list in lists %}
-        <li>{{ list.list_name }}</li>
+        <li data-list-id = "{{ list.list_id}}">
+            {{ list.list_id}}
+            {{ list.list_name }}
+            <form action="/activate_list" method="POST">
+                <input type="hidden" name="list_id" value="{{ list.list_id }}">
+                <button class="selectButton" type="submit">Valitse</button> 
+            </form>
+        </li>
     {% endfor %}
 </ul>
 
-
 {% else %}
-Tervetuloa kauppalista kauppalista-sovellukseen!
+Tervetuloa kauppalista-sovellukseen!
 <a href="/login">Kirjaudu sisään</a>
 {% endif %}

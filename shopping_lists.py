@@ -3,8 +3,6 @@ import users
 from flask import session
 from sqlalchemy.sql import text
 
-def get_list():
-    sql = text('')
 
 def new(list_name):
     user_id = users.user_id()
@@ -16,24 +14,26 @@ def new(list_name):
     db.session.commit()
 
     # The new list's id is saved to the session
-    session["list_id"] = result.fetchone()[0]
+    users.set_list_id(result.fetchone()[0])
 
     return True
 
 # Returns the content behind session["list_id"]
 def get_items():
+    list_id = users.active_list_id()
     sql = text("SELECT item_desc, item_id FROM item_lists WHERE list_id = :list_id")
-    result = db.session.execute(sql, {"list_id": session.get("list_id")})
+    result = db.session.execute(sql, {"list_id": list_id})
         
     return result.fetchall()
 
 def add_item(item_desc):
     user_id = users.user_id()
+    list_id = users.active_list_id()
     if user_id == 0:
         return False
     
     sql = text("INSERT INTO item_lists (list_id, item_desc) VALUES (:list_id, :item_desc)")
-    db.session.execute(sql, {"list_id": session.get("list_id"), "item_desc":item_desc})
+    db.session.execute(sql, {"list_id": list_id, "item_desc": item_desc})
     db.session.commit()
 
     return True

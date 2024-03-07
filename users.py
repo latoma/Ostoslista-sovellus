@@ -32,6 +32,9 @@ def register(username, password):
 def user_id():
     return session.get("user_id",0)
 
+def active_list_id():
+    return session.get("list_id")
+
 def get_shopping_lists():
     try:
         sql = text("SELECT list_name, list_id FROM shopping_lists WHERE user_id = :user_id ")
@@ -40,3 +43,17 @@ def get_shopping_lists():
     except:
         return False
     return lists
+
+def set_list_id(list_id):
+    session["list_id"] = list_id
+    
+def get_list_name():
+    try:
+        sql = text("SELECT list_name FROM shopping_lists WHERE list_id = :list_id")
+        result = db.session.execute(sql, {"list_id" : active_list_id()})
+        list = result.fetchone()
+
+    except:
+        return False
+    
+    return list
