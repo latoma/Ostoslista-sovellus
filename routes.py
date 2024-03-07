@@ -12,7 +12,14 @@ def index():
 
 @app.route("/list")
 def list():
-    return render_template("list.html", items = shopping_lists.get_items())
+    return render_template("list.html", list_name = users.get_list_name(), items = shopping_lists.get_items())
+
+@app.route("/activate_list", methods=['GET', 'POST'])
+def activate_list():
+    if request.method == "POST":
+        list_id = request.form["list_id"]
+        users.set_list_id(list_id)
+    return list()
 
 @app.route("/new", methods=['GET', 'POST'])
 def new():
@@ -27,18 +34,16 @@ def new():
 
 @app.route("/add_item", methods=["POST"])
 def add_item():
-    content = request.form["content"]
-    if shopping_lists.add_item(content):
-        return list()
-    else:
-        return  render_template("error.html", message="Tuotteen lisääminen ei onnistunut")
+    if request.method == "POST":
+        content = request.form["content"]
+        if shopping_lists.add_item(content):
+            return list()
+        else:
+            return  render_template("error.html", message="Tuotteen lisääminen ei onnistunut")
+
     
-@app.route("/removal_mode", methods=["GET", "POST"])
-def removal_mode():
-    # Renders the "removal mode"-page
-    if request.method == "GET":
-        return render_template("remove.html", items = shopping_lists.get_items())
-    
+@app.route("/remove_items", methods=["POST"])
+def remove_items():
     # Removes selected items from shopping list
     if request.method == "POST":
         removed_item_ids_string = request.form.get('removedItems')
