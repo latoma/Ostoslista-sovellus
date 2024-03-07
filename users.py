@@ -31,3 +31,12 @@ def register(username, password):
 
 def user_id():
     return session.get("user_id",0)
+
+def get_shopping_lists():
+    try:
+        sql = text("SELECT list_name, list_id FROM shopping_lists WHERE user_id = :user_id ")
+        result = db.session.execute(sql, {"user_id" : user_id()})
+        lists = result.fetchall()
+    except:
+        return False
+    return lists
