@@ -3,25 +3,32 @@
 <form action="/add_item" method="POST">
     <br>
     Kirjoita tuote ja määrä: <br>
-    <textarea name="content" rows="1" cols="40"></textarea>
+    <input type="text" name="content" id="itemContent">
     <br>
     <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
-    
-    {{list_name}}<br>
+    <br>
+    {{list_name}}
+    <br>
     <ul>
         {% for item in items %}
             <li data-item-id="{{ item.item_id }}">
                 {{ item.item_desc }}
-                <button class="removeButton" type="button">Poista</button>
+                <button class="removeButton" type="button" style="background-color: red;color: white;">X</button>
             </li>
         {% endfor %}
     </ul>
 </form>
 
 <form id="removeForm" action="/remove_items" method="POST">
+
     <!-- Hidden input field to store removed item IDs -->
     <input type="hidden" id="removedItems" name="removedItems">
-    <button type="submit" id="confirmButton" class="confirmButton">Vahvista</button>
+
+    <!-- Confirm button initially hidden -->
+    <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
+    <!-- Cancel Removals button initially hidden -->
+    <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
+
 </form>
 
 
@@ -31,6 +38,8 @@
     // and its id stored into hidden input
     document.addEventListener("DOMContentLoaded", function() {
         const removedItems = document.getElementById("removedItems");
+        const confirmButton = document.getElementById("confirmButton");
+        const cancelRemovals = document.getElementById("cancelButton");
 
         document.querySelectorAll(".removeButton").forEach(button => {
             button.addEventListener("click", event => {
@@ -38,6 +47,23 @@
                 event.target.parentElement.style.textDecoration = 'line-through';
                 event.target.parentElement.style.color = 'red';
                 removedItems.value += (removedItems.value ? "," : "") + itemId;
+
+                // Show confirm button and cancelRemovals button
+                confirmButton.style.display = 'inline-block';
+                cancelRemovals.style.display = 'inline-block';
+            });
+        });
+        cancelRemovals.addEventListener("click", function() {
+            // Clear removedItems value
+            removedItems.value = "";
+            // Hide confirm button and cancelRemovals button
+            confirmButton.style.display = 'none';
+            cancelRemovals.style.display = 'none';
+
+            // Remove the line-through and red color from all items
+            document.querySelectorAll("li").forEach(li => {
+                li.style.textDecoration = 'none';
+                li.style.color = 'inherit';
             });
         });
     });
