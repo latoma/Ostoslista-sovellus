@@ -8,9 +8,8 @@ Kauppalistat:
 <ul>
     {% for list in lists %}
         <li data-list-id = "{{ list.list_id}}">
-            {{ list.list_id}}
-            {{ list.list_name }}
             <form action="/activate_list" method="POST">
+                {{ list.list_name }}
                 <input type="hidden" name="list_id" value="{{ list.list_id }}">
                 <button class="selectButton" type="submit">Valitse</button> 
             </form>

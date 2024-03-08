@@ -8,18 +8,25 @@ def index():
     if users.user_id() == 0:
         return render_template("index.html")
     else:
-        return render_template("index.html", lists = users.get_shopping_lists())
+        return render_template("index.html", lists = shopping_lists.get_shopping_lists())
 
 @app.route("/list")
 def list():
-    return render_template("list.html", list_name = users.get_list_name(), items = shopping_lists.get_items())
+    return render_template("list.html", list_name = shopping_lists.get_list_name(), items = shopping_lists.get_items())
 
 @app.route("/activate_list", methods=['GET', 'POST'])
 def activate_list():
     if request.method == "POST":
         list_id = request.form["list_id"]
-        users.set_list_id(list_id)
+        shopping_lists.set_active_list_id(list_id)
     return list()
+
+@app.route("/delete_list", methods=["POST"])
+def delete_list():
+    if request.method == "POST":
+        shopping_lists.delete_list()
+    return index()
+
 
 @app.route("/new", methods=['GET', 'POST'])
 def new():
@@ -86,7 +93,3 @@ def register():
             return redirect("/")
         else:
             return render_template("error.html", message="Rekisteröinti ei onnistunut")
-        
-@app.route("/home")
-def home():
-    return redirect("/")

@@ -1,4 +1,8 @@
-<a href="/home"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+
+<form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan?');">
+    <button type="submit" id="deleteList">Poista lista</button>
+</form>
 
 <form action="/add_item" method="POST">
     <br>
@@ -13,7 +17,7 @@
         {% for item in items %}
             <li data-item-id="{{ item.item_id }}">
                 {{ item.item_desc }}
-                <button class="removeButton" type="button" style="background-color: red;color: white;">X</button>
+                <button class="removeButton" type="button" style="background-color: white; color: black;">Valitse</button>
             </li>
         {% endfor %}
     </ul>
@@ -39,7 +43,10 @@
     document.addEventListener("DOMContentLoaded", function() {
         const removedItems = document.getElementById("removedItems");
         const confirmButton = document.getElementById("confirmButton");
-        const cancelRemovals = document.getElementById("cancelButton");
+        const cancelButton = document.getElementById("cancelButton");
+
+        const deleteForm = document.getElementById("deleteForm");
+        const deleteListButton = document.getElementById("deleteList");
 
         document.querySelectorAll(".removeButton").forEach(button => {
             button.addEventListener("click", event => {
@@ -50,15 +57,15 @@
 
                 // Show confirm button and cancelRemovals button
                 confirmButton.style.display = 'inline-block';
-                cancelRemovals.style.display = 'inline-block';
+                cancelButton.style.display = 'inline-block';
             });
         });
-        cancelRemovals.addEventListener("click", function() {
+        cancelButton.addEventListener("click", function() {
             // Clear removedItems value
             removedItems.value = "";
             // Hide confirm button and cancelRemovals button
             confirmButton.style.display = 'none';
-            cancelRemovals.style.display = 'none';
+            cancelButton.style.display = 'none';
 
             // Remove the line-through and red color from all items
             document.querySelectorAll("li").forEach(li => {
