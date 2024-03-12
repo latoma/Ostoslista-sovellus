@@ -4,26 +4,34 @@
     <button type="submit" id="deleteList">Poista lista</button>
 </form>
 
-<form action="/add_item" method="POST">
+<form action="/share_list" method="get">
+    <button type="submit" id="shareList">Jaa lista toiselle käyttäjälle</button>
+</form>
+
+<h2>{{ list_name }}{% if shared_to %} - <span style="font-size: smaller; font-weight:normal">(Sinä, {{ shared_to }})</span>{% endif %}</h2>
+
+
+<form action="/add_list_item" method="POST">
     <br>
     Kirjoita tuote ja määrä: <br>
     <input type="text" name="content" id="itemContent">
     <br>
     <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
     <br>
-    {{list_name}}
-    <br>
     <ul>
         {% for item in items %}
             <li data-item-id="{{ item.item_id }}">
                 {{ item.item_desc }}
-                <button class="removeButton" type="button" style="background-color: white; color: black;">Valitse</button>
+                <button class="removeButton" type="button" style="display: none; background-color: red; color: white;">Valitse</button>
             </li>
         {% endfor %}
     </ul>
+
 </form>
 
-<form id="removeForm" action="/remove_items" method="POST">
+<button id="removeItemsButton" type="button">Poista tuotteita</button>
+
+<form id="removeForm" action="/remove_list_items" method="POST">
 
     <!-- Hidden input field to store removed item IDs -->
     <input type="hidden" id="removedItems" name="removedItems">
@@ -35,43 +43,79 @@
 
 </form>
 
+<label>Ateria inspiraatioita:</label>
+<div>
+    {% for recipe in recipe_list %}
+        <div class="recipe-checkbox">
+            <input type="checkbox" id="recipe{{ recipe.recipe_id }}" name="recipes[]" value="{{ recipe.recipe_id }}">
+            <label for="recipe{{ recipe.recipe_id }}">{{ recipe.recipe_name }}</label>
+        </div>
+        <div>
+            {% for item in recipe.recipe_items %}
+                <li>{{ item.item_desc }}</li>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
 
 <script>
-
     // When "poista" button is clicked next to the item it is removed from list 
     // and its id stored into hidden input
     document.addEventListener("DOMContentLoaded", function() {
         const removedItems = document.getElementById("removedItems");
         const confirmButton = document.getElementById("confirmButton");
         const cancelButton = document.getElementById("cancelButton");
+        const removeItemsButton = document.getElementById("removeItemsButton");
 
-        const deleteForm = document.getElementById("deleteForm");
-        const deleteListButton = document.getElementById("deleteList");
+         // Show removal buttons when "Poista tuotteita" button is clicked
+         removeItemsButton.addEventListener("click", function() {
+            document.querySelectorAll(".removeButton").forEach(button => {
+                button.style.display = 'inline-block';
+            });
+            // Show confirm button and cancel button
+            confirmButton.style.display = 'inline-block';
+            cancelButton.style.display = 'inline-block';
+            // Hide "Poista tuotteita" button
+            this.style.display = 'none';
+        });
 
         document.querySelectorAll(".removeButton").forEach(button => {
             button.addEventListener("click", event => {
-                const itemId = event.target.parentElement.getAttribute("data-item-id");
-                event.target.parentElement.style.textDecoration = 'line-through';
-                event.target.parentElement.style.color = 'red';
-                removedItems.value += (removedItems.value ? "," : "") + itemId;
-
-                // Show confirm button and cancelRemovals button
-                confirmButton.style.display = 'inline-block';
-                cancelButton.style.display = 'inline-block';
+                const listItem = event.target.parentElement;
+                const itemId = listItem.getAttribute("data-item-id");
+                // Toggle the class for selected items
+                listItem.classList.toggle("selectedForRemoval");
+                // If the item is selected for removal, add its ID to the removedItems input
+                if (listItem.classList.contains("selectedForRemoval")) {
+                    listItem.style.textDecoration = 'line-through';
+                    listItem.style.color = 'red';
+                    removedItems.value += (removedItems.value ? "," : "") + itemId;
+                } else { // Otherwise, remove its ID from the removedItems input
+                    listItem.style.textDecoration = 'none';
+                    listItem.style.color = 'inherit';
+                    const items = removedItems.value.split(',');
+                    const index = items.indexOf(itemId);
+                    if (index !== -1) {
+                        items.splice(index, 1);
+                        removedItems.value = items.join(',');
+                    }
+                }
             });
         });
+
         cancelButton.addEventListener("click", function() {
-            // Clear removedItems value
             removedItems.value = "";
-            // Hide confirm button and cancelRemovals button
             confirmButton.style.display = 'none';
             cancelButton.style.display = 'none';
-
-            // Remove the line-through and red color from all items
+            document.querySelectorAll(".removeButton").forEach(button => {
+                button.style.display = 'none';
+            });
             document.querySelectorAll("li").forEach(li => {
                 li.style.textDecoration = 'none';
                 li.style.color = 'inherit';
             });
+            // Show "Poista tuotteita" button
+            removeItemsButton.style.display = 'inline-block';
         });
     });
 </script>

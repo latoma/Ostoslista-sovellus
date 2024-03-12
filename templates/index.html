@@ -1,19 +1,44 @@
 {% if session.user_id %}
-Olet kirjautunut sisään.
-<form action="/new" method="get">
-    <input type="submit" value="Aloita uusi ostoslista">
+{{session.username}} | Olet kirjautunut sisään.
+<form action="/logout">
+    <input type="submit" value="Kirjaudu ulos">
+</form>
+<br>
+Ostoslistat:
+<br>
+
+<form action="/new_list" method="GET">
+    <input type="hidden" name="is_shopping_list" value="true">
+    <input type="submit" value="Tee uusi ostoslista">
 </form>
 
-Kauppalistat:
 <ul>
     {% for list in lists %}
         <li data-list-id = "{{ list.list_id}}">
             <form action="/activate_list" method="POST">
                 {{ list.list_name }}
                 <input type="hidden" name="list_id" value="{{ list.list_id }}">
-                <button class="selectButton" type="submit">Valitse</button> 
+                <button class="selectButton" type="submit">Muokkaa</button> 
             </form>
         </li>
+    {% endfor %}
+</ul>
+
+Reseptit ja ideat:
+<form action="/new_recipe" method="GET">
+    <input type="hidden" name="is_shopping_list" value="false">
+    <input type="submit" value="Tee uusi resepti">
+</form>
+
+<ul>
+    {% for recipe in recipe_list %}
+    <li data-recipe-id = "{{ recipe.recipe_id}}">
+        <form action="/activate_recipe" method="POST">
+            {{ recipe.recipe_name }}
+            <input type="hidden" name="recipe_id" value="{{ recipe.recipe_id }}">
+            <button class="selectButton" type="submit">Muokkaa</button> 
+        </form>
+    </li>
     {% endfor %}
 </ul>
 

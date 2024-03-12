@@ -18,17 +18,24 @@ CREATE TABLE list_items (
     FOREIGN KEY (list_id) REFERENCES shopping_lists(list_id)
 );
 
-CREATE TABLE ideas (
-    idea_id SERIAL PRIMARY KEY,
-    idea_name VARCHAR(50) NOT NULL,
+CREATE TABLE recipes (
+    recipe_id SERIAL PRIMARY KEY,
+    recipe_name VARCHAR(50) NOT NULL,
     user_id INT,
-    description VARCHAR(255)
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE idea_items (
-    idea_item_id SERIAL PRIMARY KEY,
-    idea_id INT NOT NULL,
+CREATE TABLE recipe_items (
+    item_id SERIAL PRIMARY KEY,
+    recipe_id INT NOT NULL,
     item_desc VARCHAR(50) NOT NULL,
-    FOREIGN KEY (idea_id) REFERENCES ideas(idea_id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
+);
+
+CREATE TABLE shared_lists (
+    shared_id SERIAL PRIMARY KEY,
+    list_id INT,
+    username VARCHAR(50),
+    FOREIGN KEY (list_id) REFERENCES shopping_lists(list_id),
+    FOREIGN KEY (username) REFERENCES users(username)
 );
