@@ -28,6 +28,25 @@ def share_list(username):
         return False
     return True
 
+def get_shared_lists():
+    try:
+        sql_query = text('''
+            SELECT sl.list_name, sl.list_id
+            FROM shopping_lists AS sl
+            JOIN shared_lists AS sls ON sl.list_id = sls.list_id
+            JOIN users AS u ON sls.username = u.username
+            WHERE u.user_id = :user_id
+        ''')
+
+        result = db.session.execute(sql_query, {"user_id": users.user_id()})
+        shared_lists = result.fetchall()
+
+        return shared_lists
+   
+    except:
+        return None
+    
+    
 # Query the database to get the usernames of users with whom the list is shared with
 def get_shared_users():
     try:
@@ -129,13 +148,41 @@ def delete_list():
 
 # Checks if user has access to given list_id 
 def has_access_to_list(list_id):
-        try:
-            sql = text("SELECT COUNT(*) FROM shopping_lists WHERE user_id = :user_id AND list_id = :list_id")
-            result = db.session.execute(sql, {"user_id": users.user_id(), "list_id": list_id})
-            count = result.scalar()  # Get the result as a single value
+    try:
+        # Check if the user_id exists in the shopping_lists table
+        sql_shopping = text('''
+            SELECT EXISTS (
+                SELECT 1
+                FROM shopping_lists
+                WHERE list_id = :list_id AND user_id = :user_id
+            )
+        ''')
+        result_shopping = db.session.execute(sql_shopping, {"list_id": list_id, "user_id": users.user_id()})
+        shopping_access = result_shopping.fetchone()[0]
 
-            # If count is greater than 0, the user has access to the list
-            return count > 0
-        except:
-            return False
+        if shopping_access:
+            return True 
         
+        # Check if the user_id exists in the shared_lists table
+        sql_shared = text('''
+            SELECT EXISTS (
+                SELECT 1
+                FROM shared_lists
+                WHERE list_id = :list_id
+                AND username = (
+                    SELECT username
+                    FROM users
+                    WHERE user_id = :user_id
+                )
+            )
+        ''')
+        result_shared = db.session.execute(sql_shared, {"list_id": list_id, "user_id": users.user_id()})
+        shared_access = result_shared.fetchone()[0]
+
+        if shared_access:
+            return True
+        
+        return False 
+    
+    except:
+        return False 
