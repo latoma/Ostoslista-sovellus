@@ -1,0 +1,18 @@
+<a href="/list"><button style="color: white; background-color: blue;">Takaisin</button></a>
+
+<h2>Jaa lista käyttäjälle</h2>
+
+<form action="/share_list" method="POST">
+    <br>
+    Syötä käyttäjänimi jolle haluat jakaa listan: <br>
+    <input type="text" name="username">
+    <br>
+
+    {% if success %}
+    <p>{{ message }}</p>
+    {% elif success == false %}
+    <p> {{ message }}</p>
+    {% endif %}
+
+    <input id="submitButton" type="submit" value="Jaa" style="color: white; background-color: green;">
+    <br>
