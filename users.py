@@ -2,7 +2,7 @@ from db import db
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
-import shopping_lists
+import shopping_lists, recipes
 
 def login(username, password):
     sql = text('SELECT user_id, password FROM users WHERE username=:username')
@@ -13,13 +13,15 @@ def login(username, password):
     else:
         if check_password_hash(user.password, password):
             session["user_id"] = user.user_id
+            session["username"] = username
             return True
         else:
             return False
 
 def logout():
     del session["user_id"]
-    shopping_lists.delete_active_list_id()
+    shopping_lists.delete_session_list_id()
+    recipes.delete_session_recipe_id()
 
 def register(username, password):
     hash_value = generate_password_hash(password)
@@ -32,4 +34,23 @@ def register(username, password):
     return login(username, password)
 
 def user_id():
-    return session.get("user_id",0)
+    return session.get("user_id", 0)
+
+def session_username():
+    return session.get("username", 0)
+
+def get_username():
+    try:
+        sql = text("SELECT username FROM users WHERE user_id=:user_id")
+        result = db.session.execute(sql, {"user_Id":user_id()})
+        username = result.fetchone()
+    except:
+        return False
+    
+    return username[0]
+
+def username_in_database(username):
+    sql = text('SELECT COUNT(*) FROM users WHERE username=:username')
+    result = db.session.execute(sql, {"username": username})
+    count = result.scalar()
+    return count > 0
