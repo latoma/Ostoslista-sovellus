@@ -1,0 +1,103 @@
+<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+
+<form action="/delete_recipe" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän reseptin?');">
+    <button type="submit" id="deleteRecipe">Poista lista</button>
+</form>
+
+<h2>{{ recipe_name }}</h2>
+
+<form action="/add_recipe_item" method="POST">
+    <br>
+    Kirjoita tuote ja määrä: <br>
+    <input type="text" name="content" id="itemContent">
+    <br>
+    <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
+    <br>
+    
+    <ul>
+        {% for item in items %}
+            <li data-item-id="{{ item.item_id }}">
+                {{ item.item_desc }}
+                <button class="removeButton" type="button" style="display: none; background-color: red; color: white;">Valitse</button>
+            </li>
+        {% endfor %}
+    </ul>
+</form>
+
+<button id="removeItemsButton" type="button">Poista tuotteita</button>
+
+<form id="removeForm" action="/remove_recipe_items" method="POST">
+
+    <!-- Hidden input field to store removed item IDs -->
+    <input type="hidden" id="removedItems" name="removedItems">
+
+    <!-- Confirm button initially hidden -->
+    <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
+    <!-- Cancel Removals button initially hidden -->
+    <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
+
+</form>
+
+
+<script>
+
+    // When "poista" button is clicked next to the item it is removed from list 
+    // and its id stored into hidden input
+    document.addEventListener("DOMContentLoaded", function() {
+        const removedItems = document.getElementById("removedItems");
+        const confirmButton = document.getElementById("confirmButton");
+        const cancelButton = document.getElementById("cancelButton");
+        const removeItemsButton = document.getElementById("removeItemsButton");
+
+         // Show removal buttons when "Poista tuotteita" button is clicked
+         removeItemsButton.addEventListener("click", function() {
+            document.querySelectorAll(".removeButton").forEach(button => {
+                button.style.display = 'inline-block';
+            });
+            // Show confirm button and cancel button
+            confirmButton.style.display = 'inline-block';
+            cancelButton.style.display = 'inline-block';
+            // Hide "Poista tuotteita" button
+            this.style.display = 'none';
+        });
+
+        document.querySelectorAll(".removeButton").forEach(button => {
+            button.addEventListener("click", event => {
+                const listItem = event.target.parentElement;
+                const itemId = listItem.getAttribute("data-item-id");
+                // Toggle the class for selected items
+                listItem.classList.toggle("selectedForRemoval");
+                // If the item is selected for removal, add its ID to the removedItems input
+                if (listItem.classList.contains("selectedForRemoval")) {
+                    listItem.style.textDecoration = 'line-through';
+                    listItem.style.color = 'red';
+                    removedItems.value += (removedItems.value ? "," : "") + itemId;
+                } else { // Otherwise, remove its ID from the removedItems input
+                    listItem.style.textDecoration = 'none';
+                    listItem.style.color = 'inherit';
+                    const items = removedItems.value.split(',');
+                    const index = items.indexOf(itemId);
+                    if (index !== -1) {
+                        items.splice(index, 1);
+                        removedItems.value = items.join(',');
+                    }
+                }
+            });
+        });
+
+        cancelButton.addEventListener("click", function() {
+            removedItems.value = "";
+            confirmButton.style.display = 'none';
+            cancelButton.style.display = 'none';
+            document.querySelectorAll(".removeButton").forEach(button => {
+                button.style.display = 'none';
+            });
+            document.querySelectorAll("li").forEach(li => {
+                li.style.textDecoration = 'none';
+                li.style.color = 'inherit';
+            });
+            // Show "Poista tuotteita" button
+            removeItemsButton.style.display = 'inline-block';
+        });
+    });
+</script>
