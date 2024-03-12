@@ -42,6 +42,19 @@ Reseptit ja ideat:
     {% endfor %}
 </ul>
 
+Sinulle jaetut listat:
+<ul>
+    {% for list in shared_lists %}
+        <li data-list-id = "{{ list.list_id}}">
+            <form action="/activate_list" method="POST">
+                {{ list.list_name }}
+                <input type="hidden" name="list_id" value="{{ list.list_id }}">
+                <button class="selectButton" type="submit">Muokkaa</button> 
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+
 {% else %}
 Tervetuloa kauppalista-sovellukseen!
 <a href="/login">Kirjaudu sisään</a>
