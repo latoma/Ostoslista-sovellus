@@ -1,0 +1,13 @@
+<title>Ostoslista - {% block title %}{% endblock %}</title>
+<h1>Ostoslista-sovellus</h1>
+{% if session.user_id %}
+Olet kirjautunut, {{ session.username }}.
+<form action="/logout">
+    <input type="submit" value="Kirjaudu ulos">
+</form>
+{% else %}
+Tervetuloa kauppalista-sovellukseen!
+<a href="/login">Kirjaudu sisään</a>
+{% endif %}
+<hr>
+{% block content %}{% endblock %}

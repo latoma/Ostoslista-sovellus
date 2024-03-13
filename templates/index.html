@@ -1,15 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %} Etusivu {% endblock %}
+
+{% block content %}
 {% if session.user_id %}
-{{session.username}} | Olet kirjautunut sisään.
-<form action="/logout">
-    <input type="submit" value="Kirjaudu ulos">
-</form>
+
 <br>
 Ostoslistat:
 <br>
 
 <form action="/new_list" method="GET">
     <input type="submit" value="Tee uusi ostoslista">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 <ul>
@@ -57,8 +58,6 @@ Sinulle jaetut listat:
         </li>
     {% endfor %}
 </ul>
-
-{% else %}
-Tervetuloa kauppalista-sovellukseen!
-<a href="/login">Kirjaudu sisään</a>
 {% endif %}
+
+{% endblock %}
