@@ -4,6 +4,6 @@
     <label>Ostoslistan nimi:</label><br>
     <textarea id="list_name" name="list_name" rows="1" cols="40" minlength="3" maxlength="40">Ostoslista {{ current_date }}</textarea><br>
     <input type="submit" value="Jatka">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 

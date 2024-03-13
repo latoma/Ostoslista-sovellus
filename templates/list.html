@@ -2,13 +2,13 @@
 
 <form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan?{% if shared_to %} HUOM. Se poistetaan myös jaetuilta käyttäjiltä{% endif %}');">
     <button type="submit" id="deleteList">Poista lista</button>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 
 <form action="/share_list" method="get">
     <button type="submit" id="shareList">Jaa lista toiselle käyttäjälle</button>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 <h2>{{ list_name }}{% if shared_to %} - <span style="font-size: smaller; font-weight:normal">(Sinä, {{ shared_to }})</span>{% endif %}</h2>
@@ -41,7 +41,7 @@
 
     <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
     <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 <div class="recipe-container">

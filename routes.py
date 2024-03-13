@@ -4,7 +4,7 @@ import users, shopping_lists, recipes, secrets
 from datetime import datetime
 from functools import wraps
 
-# Perform CSRF token verification and user authentication
+# Performs CSRF token verification and zero-user check
 def check_user_required(view_func):
     @wraps(view_func)
     def decorated_function(*args, **kwargs):
@@ -28,8 +28,7 @@ def index():
         return render_template("index.html", 
                                lists = shopping_lists.get_shopping_lists(), 
                                recipe_list = recipes.get_recipes_with_items(),
-                               shared_lists = shopping_lists.get_shared_lists(),
-                               csrf_token = session.get('csrf_token'))
+                               shared_lists = shopping_lists.get_shared_lists())
 
 @app.route("/list")
 def list():
@@ -39,21 +38,18 @@ def list():
                                list_name = shopping_lists.get_list_name(), 
                                shared_to = shared, 
                                items = shopping_lists.get_items(), 
-                               recipe_list = recipes.get_recipes_with_items(),
-                               csrf_token = session.get('csrf_token'))
+                               recipe_list = recipes.get_recipes_with_items())
     else:
         return render_template("list.html", 
                                list_name = shopping_lists.get_list_name(), 
                                items = shopping_lists.get_items(), 
-                               recipe_list = recipes.get_recipes_with_items(),
-                               csrf_token = session.get('csrf_token'))
+                               recipe_list = recipes.get_recipes_with_items())
     
 @app.route("/recipe")
 def recipe():
     return render_template("recipe.html", 
                            recipe_name = recipes.get_recipe_name(), 
-                           items = recipes.get_recipe_items(),
-                           csrf_token = session.get('csrf_token'))
+                           items = recipes.get_recipe_items())
 
 @app.route("/activate_list", methods=['POST'])
 def activate_list():
@@ -68,7 +64,7 @@ def activate_list():
 @check_user_required
 def share_list():
     if request.method == "GET":
-        return render_template("share.html", csrf_token = session.get('csrf_token'))
+        return render_template("share.html")
 
     if request.method == "POST":
         username = request.form["username"].strip()
@@ -90,8 +86,7 @@ def share_list():
             
         return render_template("share.html", 
                                success = state,
-                               message = message,
-                               csrf_token = session.get('csrf_token'))
+                               message = message)
         
 
 @app.route("/activate_recipe", methods=['POST'])
@@ -127,8 +122,7 @@ def delete_recipe():
 def new_list():
     if request.method == "GET":
         return render_template("new_list.html", 
-                               current_date = datetime.now().strftime('%d/%m/%Y'),
-                               csrf_token = session.get('csrf_token'))
+                               current_date = datetime.now().strftime('%d/%m/%Y'))
 
     if request.method == "POST":
         list_name = request.form["list_name"]
@@ -144,7 +138,7 @@ def new_list():
 @check_user_required
 def new_recipe():
     if request.method == "GET":
-        return render_template("new_recipe.html", csrf_token = session.get('csrf_token'))
+        return render_template("new_recipe.html")
 
     if request.method == "POST":
         recipe_name = request.form["recipe_name"]

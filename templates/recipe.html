@@ -2,7 +2,7 @@
 
 <form action="/delete_recipe" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän reseptin?');">
     <button type="submit" id="deleteRecipe">Poista resepti</button>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 <h2>{{ recipe_name }}</h2>
@@ -34,14 +34,11 @@
 
     <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
     <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
 
 <script>
-
-    // When "poista" button is clicked next to the item it is removed from list 
-    // and its id stored into hidden input
     document.addEventListener("DOMContentLoaded", function() {
         const removedItems = document.getElementById("removedItems");
         const confirmButton = document.getElementById("confirmButton");
@@ -66,7 +63,7 @@
                 const itemId = listItem.getAttribute("data-item-id");
                 // Toggle the class for selected items
                 listItem.classList.toggle("selectedForRemoval");
-                // If the item is selected for removal, add its ID to the removedItems input
+                // If the item is selected for removal, add its ID to the hidden removedItems input
                 if (listItem.classList.contains("selectedForRemoval")) {
                     listItem.style.textDecoration = 'line-through';
                     listItem.style.color = 'red';
@@ -83,7 +80,7 @@
                 }
             });
         });
-
+        // If removals are cancelled, the removal buttons are hidden
         cancelButton.addEventListener("click", function() {
             removedItems.value = "";
             confirmButton.style.display = 'none';
