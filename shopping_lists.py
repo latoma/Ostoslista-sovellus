@@ -5,7 +5,6 @@ from sqlalchemy.sql import text
 
 def new(list_name):
     user_id = users.user_id()
-    if user_id == 0: return False
 
     try:
         sql = text('INSERT INTO shopping_lists (list_name, user_id) VALUES (:list_name, :user_id) RETURNING list_id')
@@ -22,8 +21,6 @@ def new(list_name):
 
 # Shares active list to given user_id
 def share_list(username):
-    if users.user_id() == 0: return False
-
     try:
         sql = text('INSERT INTO shared_lists (list_id, username) VALUES (:list_id, :username)')
         db.session.execute(sql, {"list_id": session_list_id(), "username": username})
@@ -90,9 +87,7 @@ def get_list_name():
     
     return list[0] if list else None
 
-def add_item(item_desc):
-    if users.user_id == 0: return False
-    
+def add_item(item_desc):  
     try:
         sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
         db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
@@ -115,8 +110,6 @@ def get_items():
 
 # Removes given item_id(s) from database
 def remove_items(item_ids):
-    if users.user_id() == 0: return False
-
     try:
         sql = text("DELETE FROM list_items WHERE item_id = ANY(:item_ids)")
         db.session.execute(sql, {"item_ids": item_ids})
@@ -139,8 +132,6 @@ def get_shopping_lists():
 def delete_list():
     list_id = session_list_id()
     user_id = users.user_id()
-
-    if not has_access_to_list(list_id): return False
 
     try:
         sql_items = text("DELETE FROM list_items WHERE list_id =:list_id")

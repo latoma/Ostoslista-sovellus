@@ -5,7 +5,6 @@ from sqlalchemy.sql import text
 
 def new(recipe_name):
     user_id = users.user_id()
-    if user_id == 0: return False
 
     try:
         sql = text('INSERT INTO recipes (recipe_name, user_id) VALUES (:recipe_name, :user_id) RETURNING recipe_id')
@@ -35,9 +34,7 @@ def get_recipe_name():
 
     return name[0] if name else None
     
-def add_item(item_desc):
-    if users.user_id() == 0: return False
-    
+def add_item(item_desc):    
     try:
         sql = text("INSERT INTO recipe_items (recipe_id, item_desc) VALUES (:recipe_id, :item_desc)")
         db.session.execute(sql, {"recipe_id": session_recipe_id(), "item_desc": item_desc})
@@ -104,9 +101,6 @@ def delete_recipe():
         
 # Removes given list of items from database
 def remove_items(item_ids):
-    user_id = users.user_id()
-    if user_id == 0: return False
-
     try:
         sql = text("DELETE FROM recipe_items WHERE item_id = ANY(:item_ids)")
         db.session.execute(sql, {"item_ids": item_ids})
