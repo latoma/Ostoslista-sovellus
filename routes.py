@@ -8,7 +8,10 @@ from functools import wraps
 def check_user_required(view_func):
     @wraps(view_func)
     def decorated_function(*args, **kwargs):
-        csrf_token = request.form.get('csrf_token')
+
+        csrf_token = (request.form.get('csrf_token') 
+              if request.method == 'POST' 
+              else request.args.get('csrf_token'))
 
         if session.get('csrf_token') != csrf_token:
             abort(403)
