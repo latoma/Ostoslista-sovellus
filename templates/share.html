@@ -4,7 +4,7 @@
 
 <form action="/share_list" method="POST">
     <br>
-    Syötä käyttäjänimi jolle haluat jakaa listan: <br>
+    Syötä käyttäjänimi jolle haluat jakaa listan (huomioi isot/pienet kirjaimet): <br>
     <input type="text" name="username">
     <br>
 
@@ -15,4 +15,5 @@
     {% endif %}
 
     <input id="submitButton" type="submit" value="Jaa" style="color: white; background-color: green;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <br>

@@ -1,11 +1,14 @@
 <a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
 
-<form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan?');">
+<form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan?{% if shared_to %} HUOM. Se poistetaan myös jaetuilta käyttäjiltä{% endif %}');">
     <button type="submit" id="deleteList">Poista lista</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
+
 
 <form action="/share_list" method="get">
     <button type="submit" id="shareList">Jaa lista toiselle käyttäjälle</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
 
 <h2>{{ list_name }}{% if shared_to %} - <span style="font-size: smaller; font-weight:normal">(Sinä, {{ shared_to }})</span>{% endif %}</h2>
@@ -14,7 +17,7 @@
 <form action="/add_list_item" method="POST">
     <br>
     Kirjoita tuote ja määrä: <br>
-    <input type="text" name="content" id="itemContent">
+    <input type="text" name="content" id="itemContent" minlength="3" maxlength="40">
     <br>
     <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
     <br>
@@ -33,27 +36,23 @@
 
 <form id="removeForm" action="/remove_list_items" method="POST">
 
-    <!-- Hidden input field to store removed item IDs -->
+    <!-- Hidden input field to store IDS of removed items -->
     <input type="hidden" id="removedItems" name="removedItems">
 
-    <!-- Confirm button initially hidden -->
     <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
-    <!-- Cancel Removals button initially hidden -->
     <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
-
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
 
-<label>Ateria inspiraatioita:</label>
-<div>
+<div class="recipe-container">
     {% for recipe in recipe_list %}
-        <div class="recipe-checkbox">
-            <input type="checkbox" id="recipe{{ recipe.recipe_id }}" name="recipes[]" value="{{ recipe.recipe_id }}">
-            <label for="recipe{{ recipe.recipe_id }}">{{ recipe.recipe_name }}</label>
-        </div>
-        <div>
-            {% for item in recipe.recipe_items %}
-                <li>{{ item.item_desc }}</li>
-            {% endfor %}
+        <div class="recipe-card">
+            <h3>{{ recipe.recipe_name }}</h3>
+            <ul class="item-list">
+                {% for item in recipe.recipe_items %}
+                    <li>{{ item.item_desc }}</li>
+                {% endfor %}
+            </ul>
         </div>
     {% endfor %}
 </div>

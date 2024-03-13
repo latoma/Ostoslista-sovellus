@@ -5,8 +5,8 @@ from sqlalchemy.sql import text
 
 def new(recipe_name):
     user_id = users.user_id()
-    if user_id == 0:
-        return False
+    if user_id == 0: return False
+
     try:
         sql = text('INSERT INTO recipes (recipe_name, user_id) VALUES (:recipe_name, :user_id) RETURNING recipe_id')
         result = db.session.execute(sql, {"recipe_name":recipe_name, "user_id":user_id})
@@ -30,16 +30,13 @@ def get_recipe_name():
         sql = text('SELECT recipe_name FROM recipes WHERE recipe_id = :recipe_id')
         result = db.session.execute(sql, {"recipe_id": session_recipe_id()})
         name = result.fetchone()
-        if name:
-            return name[0]
-        else:
-            return False
     except :
-        return False
+        return None
+
+    return name[0] if name else None
     
 def add_item(item_desc):
-    if users.user_id() == 0:
-        return False
+    if users.user_id() == 0: return False
     
     try:
         sql = text("INSERT INTO recipe_items (recipe_id, item_desc) VALUES (:recipe_id, :item_desc)")
@@ -57,11 +54,13 @@ def get_recipe_items():
         sql = text('SELECT item_desc, item_id FROM recipe_items WHERE recipe_id =:recipe_id')
         result = db.session.execute(sql, {"recipe_id": session_recipe_id()})
         items = result.fetchall()
-        return items
     except:
         return None
     
-def get_recipes():
+    return items
+
+# Convert the dictionary of recipes into a list of recipe dictionaries.
+def get_recipes_with_items():
     result = ""
     try:
         sql = text('''
@@ -72,8 +71,7 @@ def get_recipes():
         ''')
         result = db.session.execute(sql, {"user_id": users.user_id()})
     
-    except Exception as e:
-        print("Error fetching recipes:", e)
+    except:
         return None
 
     recipes = {}
@@ -90,24 +88,25 @@ def delete_session_recipe_id():
     if session_recipe_id():
         del session["active_recipe_id"]
 
+# Delete recipe and its items from database
 def delete_recipe():
-        id = session_recipe_id()
+        recipe_id = session_recipe_id()
         try:
             sql_items = text("DELETE FROM recipe_items WHERE recipe_id =:recipe_id")
             sql_list = text("DELETE FROM recipes WHERE recipe_id = :recipe_id AND user_id =:user_id")
-
-            db.session.execute(sql_items, {"recipe_id": id})
-            db.session.execute(sql_list, {"recipe_id": id, "user_id":users.user_id()})
+            db.session.execute(sql_items, {"recipe_id": recipe_id})
+            db.session.execute(sql_list, {"recipe_id": recipe_id, "user_id":users.user_id()})
             db.session.commit()
-            return True
         except:
             return False
         
-# Removes given item_id(s) from database
+        return True
+        
+# Removes given list of items from database
 def remove_items(item_ids):
     user_id = users.user_id()
-    if user_id == 0:
-        return False
+    if user_id == 0: return False
+
     try:
         sql = text("DELETE FROM recipe_items WHERE item_id = ANY(:item_ids)")
         db.session.execute(sql, {"item_ids": item_ids})
@@ -116,4 +115,3 @@ def remove_items(item_ids):
         return False
     
     return True
-

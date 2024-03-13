@@ -10,6 +10,7 @@ Ostoslistat:
 <form action="/new_list" method="GET">
     <input type="hidden" name="is_shopping_list" value="true">
     <input type="submit" value="Tee uusi ostoslista">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
 
 <ul>
@@ -19,6 +20,7 @@ Ostoslistat:
                 {{ list.list_name }}
                 <input type="hidden" name="list_id" value="{{ list.list_id }}">
                 <button class="selectButton" type="submit">Muokkaa</button> 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             </form>
         </li>
     {% endfor %}
@@ -28,6 +30,7 @@ Reseptit ja ideat:
 <form action="/new_recipe" method="GET">
     <input type="hidden" name="is_shopping_list" value="false">
     <input type="submit" value="Tee uusi resepti">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
 
 <ul>
@@ -37,6 +40,7 @@ Reseptit ja ideat:
             {{ recipe.recipe_name }}
             <input type="hidden" name="recipe_id" value="{{ recipe.recipe_id }}">
             <button class="selectButton" type="submit">Muokkaa</button> 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         </form>
     </li>
     {% endfor %}
@@ -50,6 +54,7 @@ Sinulle jaetut listat:
                 {{ list.list_name }}
                 <input type="hidden" name="list_id" value="{{ list.list_id }}">
                 <button class="selectButton" type="submit">Muokkaa</button> 
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             </form>
         </li>
     {% endfor %}

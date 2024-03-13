@@ -50,7 +50,10 @@ def get_username():
     return username[0]
 
 def username_in_database(username):
-    sql = text('SELECT COUNT(*) FROM users WHERE username=:username')
-    result = db.session.execute(sql, {"username": username})
-    count = result.scalar()
+    try:
+        sql = text('SELECT COUNT(*) FROM users WHERE username=:username')
+        result = db.session.execute(sql, {"username": username})
+        count = result.scalar()
+    except:
+        return False
     return count > 0

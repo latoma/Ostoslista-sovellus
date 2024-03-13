@@ -2,6 +2,7 @@
 
 <form id="newForm" method="POST" action="/new_recipe">
     <label>Reseptin nimi:</label><br>
-    <textarea id="recipe_name" name="recipe_name" rows="1" cols="40" minlength="3" maxlength="50"></textarea><br>
+    <textarea id="recipe_name" name="recipe_name" rows="1" cols="40" minlength="3" maxlength="40"></textarea><br>
     <input type="submit" value="Jatka">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 </form>
