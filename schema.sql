@@ -8,7 +8,9 @@ CREATE TABLE shopping_lists (
     list_id SERIAL PRIMARY KEY,
     list_name VARCHAR(40) NOT NULL,
     user_id INT,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    created_by VARCHAR(40),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (created_by) REFERENCES users(username)
 );
 
 CREATE TABLE list_items (
