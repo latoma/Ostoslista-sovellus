@@ -7,8 +7,12 @@ def new(list_name):
     user_id = users.user_id()
 
     try:
-        sql = text('INSERT INTO shopping_lists (list_name, user_id) VALUES (:list_name, :user_id) RETURNING list_id')
-        result = db.session.execute(sql, {"list_name":list_name, "user_id":user_id})
+        sql = text('''INSERT INTO shopping_lists (list_name, user_id, created_by) 
+                   VALUES (:list_name, :user_id, :created_by) 
+                   RETURNING list_id''')
+        result = db.session.execute(sql, {"list_name":list_name, 
+                                          "user_id":user_id,
+                                          "created_by": users.get_username()})
         db.session.commit()
 
         # The new list's id is saved to the session
@@ -63,11 +67,8 @@ def get_shared_users():
         return None
     
 def set_session_list_id(list_id):
-    if has_access_to_list(list_id):
-        session["active_list_id"] = list_id
-        return True
-    else:
-        return False
+    session["active_list_id"] = list_id
+
 
 def session_list_id():
     return session.get("active_list_id")
@@ -76,16 +77,16 @@ def delete_session_list_id():
     if session_list_id():
         del session["active_list_id"]
 
-def get_list_name():
+def get_list_name_and_owner():
     try:
-        sql = text("SELECT list_name FROM shopping_lists WHERE list_id = :list_id")
+        sql = text("SELECT list_name, created_by FROM shopping_lists WHERE list_id = :list_id")
         result = db.session.execute(sql, {"list_id" : session_list_id()})
         list = result.fetchone()
 
     except:
         return None
     
-    return list[0] if list else None
+    return list
 
 def add_item(item_desc):  
     try:
@@ -140,18 +141,31 @@ def delete_list():
         sql_shared = text("DELETE FROM shared_lists WHERE list_id =:list_id")
         db.session.execute(sql_shared, {"list_id": list_id})
 
-        sql_list = text("DELETE FROM shopping_lists WHERE list_id =:list_id AND user_id=:user_id")
-        db.session.execute(sql_list, {"list_id": list_id, "user_id": user_id})
+        sql_list = text("""DELETE FROM shopping_lists 
+                        WHERE list_id =:list_id AND user_id=:user_id""")
+        db.session.execute(sql_list, {"list_id": list_id, 
+                                      "user_id": user_id})
         db.session.commit()
     except:
         return False
     
     return True
 
+def delete_sharing():
+    try:
+        sql = text("""DELETE FROM shared_lists 
+                   WHERE username=:username AND list_id=:list_id""")
+        db.session.execute(sql, {"username": users.get_username(), 
+                                 "list_id": session_list_id()})
+        db.session.commit()
+    except:
+        return False
+    return True
+
 # Checks if user has access to given list_id 
 def has_access_to_list(list_id):
     try:
-        # Check the shopping_lists table
+        # Check access from shopping_lists
         sql_shopping = text('''
             SELECT EXISTS (
                 SELECT 1
@@ -159,13 +173,14 @@ def has_access_to_list(list_id):
                 WHERE list_id = :list_id AND user_id = :user_id
             )
         ''')
-        result_shopping = db.session.execute(sql_shopping, {"list_id": list_id, "user_id": users.user_id()})
-        shopping_access = result_shopping.fetchone()[0]
+        result = db.session.execute(sql_shopping, {"list_id": list_id, 
+                                                   "user_id": users.user_id()})
+        shopping_access = result.fetchone()[0]
 
         if shopping_access:
             return True 
         
-        # Check the shared_lists table
+        # Check acccess from shared_lists
         sql_shared = text('''
             SELECT EXISTS (
                 SELECT 1
@@ -178,13 +193,14 @@ def has_access_to_list(list_id):
                 )
             )
         ''')
-        result_shared = db.session.execute(sql_shared, {"list_id": list_id, "user_id": users.user_id()})
-        shared_access = result_shared.fetchone()[0]
+        result = db.session.execute(sql_shared, {"list_id": list_id, 
+                                                 "user_id": users.user_id()})
+        shared_access = result.fetchone()[0]
 
         if shared_access:
             return True
         
-        return False 
+        return False # No access to given list was found
     
     except:
         return False 

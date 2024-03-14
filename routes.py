@@ -8,7 +8,6 @@ from functools import wraps
 def check_user_required(view_func):
     @wraps(view_func)
     def decorated_function(*args, **kwargs):
-
         csrf_token = (request.form.get('csrf_token') 
               if request.method == 'POST' 
               else request.args.get('csrf_token'))
@@ -38,13 +37,13 @@ def list():
     shared = shopping_lists.get_shared_users()
     if shared:
         return render_template("list.html", 
-                               list_name = shopping_lists.get_list_name(), 
+                               list = shopping_lists.get_list_name_and_owner(),
                                shared_to = shared, 
                                items = shopping_lists.get_items(), 
                                recipe_list = recipes.get_recipes_with_items())
     else:
         return render_template("list.html", 
-                               list_name = shopping_lists.get_list_name(), 
+                               list = shopping_lists.get_list_name_and_owner(), 
                                items = shopping_lists.get_items(), 
                                recipe_list = recipes.get_recipes_with_items())
     
@@ -58,10 +57,11 @@ def recipe():
 def activate_list():
     if request.method == "POST":
         list_id = request.form["list_id"]
-        if shopping_lists.set_session_list_id(list_id):
+        if shopping_lists.has_access_to_list(list_id):
+            shopping_lists.set_session_list_id(list_id)
             return redirect("/list")
         else:
-            return render_template("error.html", message="Listan valitseminen ei onnistunut")
+            return render_template("error.html", message="Ei oikeutta listaan")
     
 @app.route("/share_list", methods=["GET", "POST"])
 @check_user_required
@@ -97,18 +97,28 @@ def share_list():
 def activate_recipe():
     if request.method == 'POST':
         recipe_id = request.form["recipe_id"]
-        recipes.set_session_recipe_id(recipe_id)
-        return redirect("/recipe")
+        if recipes.has_access_to_recipe(recipe_id):
+            recipes.set_session_recipe_id(recipe_id)
+            return redirect("/recipe")
+        else:
+            render_template("error.html", message="Ei oikeutta reseptiin",)
+
     
 
 @app.route("/delete_list", methods=["POST"])
 @check_user_required
 def delete_list():
     if request.method == "POST":
-        if shopping_lists.delete_list():
-            return redirect("/")
+        shared = shopping_lists.get_shared_users()
+        if shared:
+            if shopping_lists.delete_sharing():
+                return redirect("/")                
+        
         else:
-            return render_template("error.html", message="Listan poistaminen epäonnistui",)
+            if shopping_lists.delete_list():
+                return redirect("/")
+        
+        return render_template("error.html", message="Listan poistaminen epäonnistui")
 
 @app.route("/delete_recipe", methods=["POST"])
 @check_user_required

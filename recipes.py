@@ -109,3 +109,24 @@ def remove_items(item_ids):
         return False
     
     return True
+
+# Checks that user has access to recipe
+def has_access_to_recipe(recipe_id):
+    try:
+        sql = text('''
+            SELECT EXISTS (
+                SELECT 1
+                FROM recipes
+                WHERE recipe_id = :recipe_id AND user_id = :user_id
+            )
+        ''')
+        result = db.session.execute(sql, {"recipe_id": recipe_id,
+                                          "user_id": users.user_id()})
+        access = result.fetchone()[0]
+
+        if access:
+            return True 
+        
+        return False
+    except:
+        return False
