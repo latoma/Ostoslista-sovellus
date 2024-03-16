@@ -24,7 +24,8 @@ Ostoslista-sovelluksella voi tehdä yksinkertaisia ostoslistoja ja jakaa niitä 
 
 ### Kloonaa tämä repository omalle koneellesi ja siirry sen juurikansioon.
 ```
-git clone <repository-url>
+git clone https://github.com/latoma/Ostoslista-sovellus.git
+cd Ostoslista-sovellus
 ```
 ### Luo virtuaaliympäristö
 - Luo juurikansioon `.env`-tiedoso ja määritä sen sisälö seuraavanlaiseksi:
