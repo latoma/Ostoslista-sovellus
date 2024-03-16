@@ -3,7 +3,10 @@
 {% block title %} Listan jakaminen {% endblock %}
 
 {% block buttons %}
-<a href="javascript:window.history.back();"><button style="color: white; background-color: blue;">&#60;&#60;&#60;</button></a>
+<form action="/list" method="get">
+    <!-- Button to trigger the request -->
+    <button type="submit" style="color: white; background-color: blue">Takaisin listaan</button>
+</form>
 {% endblock %}
 
 {% block content %}

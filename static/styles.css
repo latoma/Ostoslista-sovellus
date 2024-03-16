@@ -78,6 +78,16 @@ form {
     border-radius: 20px;
 }
 
+.list-selection-buttons {
+    display: flex; /* Display forms inline */
+    margin-right: 5px; /* Adjust spacing between buttons */
+    border-bottom: 1px solid #ccc; /* Add a solid border at the bottom of each list item */
+}
+
+#list-name-index {
+    margin-top: 10px;
+}
+
 .list-container {
     flex: 1; 
     padding: 10px;
@@ -151,6 +161,11 @@ form {
 .items-container {
     flex: 1; 
 }
+
+.item-view-container ul.centered-list li {
+    font-size: 1.2em; /* Increase font size of list items */
+}
+
 
 .button-container {
     display: flex; /* Use flexbox */
