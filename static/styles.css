@@ -1,0 +1,209 @@
+.header-container {
+    text-align: center;
+    display: flex; /* Use Flexbox */
+    justify-content: center; /* Center horizontally (X-axis) */
+    align-items: center; /* Center vertically (Y-axis) */
+    text-align: center;
+    
+}
+.header {
+    background: rgb(255, 76, 22);
+    font-weight: bold;
+    padding: 0.4em; 
+    font-size: 1.5em;
+    border-radius: 20px;
+    width: 100%;
+}
+
+body {
+    margin: auto;
+    max-width: 45em;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background: skyblue;
+}
+
+nav form{
+    display: inline-block;
+    padding: 0;
+}
+
+#recipe-name, #list-name  {
+    text-transform: capitalize;
+}
+
+form {
+    padding: .5em;
+}
+
+.subheader-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 30px;
+    border-radius: 20px;
+    min-height: 0;
+    background-color: rgb(252, 255, 88);
+}
+
+#register{
+    margin-left: 20px;
+}
+
+.user-info{
+    display: flex;
+    flex: 1;
+    align-items: center;
+}
+
+.user-info h2 {
+    margin-top: 20px;
+}
+
+.user-info,
+.create-new {
+    display: flex;
+    align-items: center;
+}
+
+.user-info form,
+.create-new form {
+    margin-left: 10px;
+}
+
+.content-container{
+    display: flex;
+    height: 100%;
+    background-color: white;
+    padding: 1em;
+    border-radius: 20px;
+}
+
+.list-container {
+    flex: 1; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px; 
+    align-items: left;
+    margin-left: 10px;
+}
+
+#list-name {
+    max-width: 300px; /* Maximum width of the list name */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Display ellipsis (...) when text overflows */
+    white-space: nowrap; /* Prevent wrapping */
+    font-size: 1.5em; /* Default font size */
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 300px) {
+    #list-name {
+        font-size: 1em; /* Decrease font size for smaller container widths */
+    }
+}
+
+.list-container h2 {
+    margin-bottom: 10px;
+}
+
+.left-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px; 
+    margin-left: 20px;
+}
+
+.created-at-stamp {
+    margin-top: auto; /* Push to the bottom */
+}
+
+.left-container h2 {
+    margin-bottom: 0px; /* Adjust the margin as needed */
+}
+
+.right-container {
+    flex: 1;
+    display: flex;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px; 
+    flex-direction: column;
+    align-items: left;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes items to the top and bottom */
+    height: 100%;
+}
+
+.right-container h2{
+    text-align: center;
+}
+
+.right-container h2, .recipes h2 {
+    margin-bottom: 0px; /* Adjust the margin as needed */
+}
+
+
+.remove-buttons{
+    text-align: center;
+}
+
+.items-container {
+    flex: 1; 
+}
+
+.button-container {
+    display: flex; /* Use flexbox */
+    flex-wrap: wrap; /* Allow buttons to wrap onto multiple lines if needed */
+    justify-content: space-between; /* Align items starting from the left */
+    align-items: center;
+    background-color: violet;
+    padding: 5px 20px;
+    border-radius: 20px;
+    min-height: 0;
+}
+
+.button-container button {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.recipe-container {
+    border: 2px solid black; /* Add outline */
+    padding: 10px; /* Add padding for spacing */
+    overflow: hidden; /* Hide overflow */
+}
+
+.recipe-container h3 {
+    text-align: center; /* Center-align the header */
+    margin-top: 0; /* Remove default top margin */
+    background-color: beige;
+}
+
+.recipe-container h2 {
+    text-align: center; /* Center-align the header */
+    margin-top: 0; /* Remove default top margin */
+}
+
+.scrollable-container {
+    max-height: 300px; /* Adjust the max height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    padding: 10px 0; /* Add padding only to the top and bottom */
+}
+
+.scrollable-container .recipe-card {
+    margin-bottom: 10px; /* Add margin between recipe cards */
+}
+
+.scrollable-container .recipe-card h3 {
+    margin-top: 0; /* Remove top margin for recipe names */
+}
+
+.scrollable-container .item-list {
+    list-style-position: inside;
+}
+
+#item-content {
+    width: 200px;
+}

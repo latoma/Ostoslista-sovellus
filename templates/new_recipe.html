@@ -1,8 +1,17 @@
-<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+{% extends "layout.html" %}
 
+{% block title %} Uusi resepti {% endblock %}
+
+{% block buttons %}
+<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+{% endblock %}
+
+{% block content %}
 <form id="newForm" method="POST" action="/new_recipe">
     <label>Reseptin nimi:</label><br>
-    <textarea id="recipe_name" name="recipe_name" rows="1" cols="40" minlength="3" maxlength="40"></textarea><br>
+    <textarea id="recipe_name" name="recipe_name" rows="1" cols="40" minlength="3"></textarea><br>
     <input type="submit" value="Jatka">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
+
+{% endblock %}

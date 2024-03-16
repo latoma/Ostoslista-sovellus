@@ -1,60 +1,106 @@
-<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+{% extends "layout.html" %}
 
-<form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan?{% if shared_to %} HUOM. Se poistetaan myös jaetuilta käyttäjiltä{% endif %}');">
-    <button type="submit" id="deleteList">Poista lista</button>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
+{% block title %} Listan muokkaus {% endblock %}
+
+{% block buttons %}
+    <a href="/"><button style="background-color:blue; color: white;">Palaa etusivulle</button></a>
+    
+    {%if session.username == list.created_by%}
+        <form action="/share_list" method="get">
+            <button type="submit" id="shareList" style="background-color:chartreuse; color: black;">Jaa lista toiselle käyttäjälle</button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+
+        <form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän listan? (HUOM! Lista poistetaan myös jaetuilta käyttäjiltä)');">
+            <button type="submit" id="deleteList" style="background-color: red; color: white;" >Poista lista</button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+
+    {% else %}
+        <form action="/delete_list" method="post" onsubmit="return confirm('Haluatko varmasti poistua tästä listasta?');">
+            <button type="submit" id="deleteList" style="background-color: red; color: white;" >Poistu listasta</button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+    {% endif %}
+    
+{% endblock %}
+
+{% block content %}
+
+<div class="left-container">
+    <div class="info-container">
+        <h1 id="list-name">{{ list.list_name }}</h1> 
+
+        <h4>Listan omistaja: {{ list.created_by }}</h4>
+
+        {% if shared_to %}
+        <h4>Jaettu: {{ shared_to }}</h4>
+        {% endif %}
+
+        <form action="/add_list_item" method="POST">
+            Kirjoita tuote ja määrä: <br>
+            <input type="text" name="content" id="itemContent" minlength="3" >
+            <br>
+            <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">    
+        </form>
 
 
-<form action="/share_list" method="get">
-    <button type="submit" id="shareList">Jaa lista toiselle käyttäjälle</button>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
+    </div>
 
-<h2>{{ list_name }}{% if shared_to %} - <span style="font-size: smaller; font-weight:normal">(Sinä, {{ shared_to }})</span>{% endif %}</h2>
-
-
-<form action="/add_list_item" method="POST">
-    <br>
-    Kirjoita tuote ja määrä: <br>
-    <input type="text" name="content" id="itemContent" minlength="3" maxlength="40">
-    <br>
-    <input id="submitButton" type="submit" value="Lisää" style="color: white; background-color: green;">
-    <br>
-    <ul>
-        {% for item in items %}
-            <li data-item-id="{{ item.item_id }}">
-                {{ item.item_desc }}
-                <button class="removeButton" type="button" style="display: none; background-color: red; color: white;">Valitse</button>
-            </li>
+    <div class="recipe-container">
+        <h2>Reseptit:</h2>
+        <div class="scrollable-container">
+            {% if recipe_list %}
+            {% for recipe in recipe_list %}
+            <div class="recipe-card">
+                <h3 id="recipe-name">{{ recipe.recipe_name }}</h3>
+                <ul class="item-list">
+                    {% for item in recipe.recipe_items %}
+                        <li>{{ item.item_desc }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endfor %}
-    </ul>
-
-</form>
-
-<button id="removeItemsButton" type="button">Poista tuotteita</button>
-
-<form id="removeForm" action="/remove_list_items" method="POST">
-
-    <!-- Hidden input field to store IDS of removed items -->
-    <input type="hidden" id="removedItems" name="removedItems">
-
-    <button type="submit" id="confirmButton" style="display: none; background-color: red;color: white;">Vahvista muutokset</button>
-    <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
-
-<div class="recipe-container">
-    {% for recipe in recipe_list %}
-        <div class="recipe-card">
-            <h3>{{ recipe.recipe_name }}</h3>
-            <ul class="item-list">
-                {% for item in recipe.recipe_items %}
-                    <li>{{ item.item_desc }}</li>
-                {% endfor %}
-            </ul>
+        {% else %}
+        (Reseptit näkyvät tässä)
+        {% endif %}
         </div>
-    {% endfor %}
+    </div>
+    <div class="created-at-stamp">
+        <p>Created at: {{list.created_at}}</p>
+    </div>    
+</div>
+
+
+<div class="right-container">
+    <div class="item-container">
+        <h2>Tuotteet:</h2>
+        <ul>
+            {% for item in items %}
+                <li data-item-id="{{ item.item_id }}">
+                    {{ item.item_desc }}
+                    <button class="removeButton" type="button" style="display: none; background-color: #ff6666; color: white;">Valitse</button>
+                </li>
+            {% endfor %}
+        </ul>        
+    </div>
+
+    <div class="remove-buttons">
+        <button id="removeItemsButton" type="button" style="background-color: #ff6666; color: white;">Poista tuotteita</button>
+
+        <form id="removeForm" action="/remove_list_items" method="POST">
+
+            <!-- Hidden input field to store IDS of removed items -->
+            <input type="hidden" id="removedItems" name="removedItems">
+
+            <button type="submit" id="confirmButton" style="display: none; background-color: #ff6666;color: white;">Vahvista muutokset</button>
+            <button type="button" id="cancelButton" style="display: none; background-color: grey;color: white;">Peruuta muutokset</button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+    </div>
+
+
+
 </div>
 
 <script>
@@ -118,3 +164,5 @@
         });
     });
 </script>
+
+{% endblock %}

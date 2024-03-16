@@ -1,1 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %} Virhe {% endblock %}
+
+{% block buttons %}
+<a href="javascript:window.history.back();"><button style="color: white; background-color: blue;">&#60;&#60;&#60;</button></a>
+{% endblock %}
+
+{% block content %}
+
 Virhe: {{ message }}
+
+{% endblock %}

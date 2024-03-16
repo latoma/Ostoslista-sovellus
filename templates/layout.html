@@ -1,13 +1,48 @@
-<title>Ostoslista - {% block title %}{% endblock %}</title>
-<h1>Ostoslista-sovellus</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ostoslista - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+
+<div class="header-container">
+    <div class="header">
+        <h1>Ostoslista-sovellus</h1>
+    </div>
+</div>
+
+
 {% if session.user_id %}
-Olet kirjautunut, {{ session.username }}.
-<form action="/logout">
-    <input type="submit" value="Kirjaudu ulos">
-</form>
+<div class="subheader-container">
+    <div class="user-info">
+        <h3>Olet kirjautunut sisään, {{ session.username }}.</h3>
+        <div class="logout-button">
+            <form action="/logout">
+                <input type="submit" value="Kirjaudu ulos" style="background-color: white;">
+            </form>
+        </div>
+    </div>
+</div>
+
 {% else %}
-Tervetuloa kauppalista-sovellukseen!
-<a href="/login">Kirjaudu sisään</a>
+<div class="subheader-container">
+    <div class="user-info">
+        <h2>Tervetuloa Ostoslista-sovellukseen!</h2>
+    </div>
+    <a href="/login"><button id="login" style="background-color: white;">Kirjaudu sisään</button></a>
+    <a href="/register"><button id="register" style="background-color: rgb(255, 255, 255);">Rekisteröidy</button></a>
+</div>
 {% endif %}
-<hr>
-{% block content %}{% endblock %}
+
+<body>
+    <div class="button-container">
+        {% block buttons %}{% endblock %}
+    </div>
+
+    <div class="content-container">
+        
+        {% block content %}{% endblock %}
+    </div>
+</body>

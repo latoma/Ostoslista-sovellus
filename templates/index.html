@@ -2,62 +2,90 @@
 
 {% block title %} Etusivu {% endblock %}
 
-{% block content %}
+{% block buttons %}
 {% if session.user_id %}
-
-<br>
-Ostoslistat:
-<br>
-
-<form action="/new_list" method="GET">
-    <input type="submit" value="Tee uusi ostoslista">
-</form>
-
-<ul>
-    {% for list in lists %}
-        <li data-list-id = "{{ list.list_id}}">
-            <form action="/activate_list" method="POST">
-                {{ list.list_name }}
-                <input type="hidden" name="list_id" value="{{ list.list_id }}">
-                <button class="selectButton" type="submit">Muokkaa</button> 
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            </form>
-        </li>
-    {% endfor %}
-</ul>
-
-Reseptit ja ideat:
-<form action="/new_recipe" method="GET">
-    <input type="submit" value="Tee uusi resepti">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
-
-<ul>
-    {% for recipe in recipe_list %}
-    <li data-recipe-id = "{{ recipe.recipe_id}}">
-        <form action="/activate_recipe" method="POST">
-            {{ recipe.recipe_name }}
-            <input type="hidden" name="recipe_id" value="{{ recipe.recipe_id }}">
-            <button class="selectButton" type="submit">Muokkaa</button> 
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+<div class="create-new">
+    <h3>Tee uusi:</h3>
+    <nav>
+        <form action="/new_list" method="GET">
+            <input type="submit" value="Uusi ostoslista" style="background-color: white;">
         </form>
-    </li>
-    {% endfor %}
-</ul>
 
-Sinulle jaetut listat:
-<ul>
-    {% for list in shared_lists %}
-        <li data-list-id = "{{ list.list_id}}">
-            <form action="/activate_list" method="POST">
-                {{ list.list_name }}
-                <input type="hidden" name="list_id" value="{{ list.list_id }}">
-                <button class="selectButton" type="submit">Muokkaa</button> 
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            </form>
-        </li>
-    {% endfor %}
-</ul>
-{% endif %}
+        <form action="/new_recipe" method="GET">
+            <input type="submit" value="Uusi resepti" style="background-color: white;">
+        </form>
+    </nav>
+</div>
+{% else %}
+<h3>Tehnyt: Toma Lahtinen 2024 (TSOHA-kurssi) </h3>
+{% endif %} 
 
 {% endblock %}
+
+{% block content %}
+{% if session.user_id %}
+<ul class="list-container">
+    <h2>Ostoslistat:</h2>
+    {% if lists %}
+
+    {% for list in lists %}
+        <li>
+            <form action="/activate_list" method="POST">
+                {{ list.list_name }}
+                <input type="hidden" name="list_id" value="{{ list.list_id }}">
+                <button class="selectButton" type="submit">Muokkaa</button> 
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            </form>
+        </li>
+    {% endfor %}
+
+    {% else %}
+    Ei listoja
+    {% endif %}
+</ul>
+<div class="right-container">
+    <h2>Sinulle jaetut listat:</h2>
+    {% if shared_lists %}
+    <ul class="shared-list-container">
+        {% for list in shared_lists %}
+            <li>
+                <form action="/activate_list" method="POST">
+                    {{ list.list_name }}
+                    <input type="hidden" name="list_id" value="{{ list.list_id }}">
+                    <button class="selectButton" type="submit">Muokkaa</button> 
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                </form>
+            </li>
+        {% endfor %}
+
+        {% else %}
+        Ei jaettuja listoja
+        {% endif %}
+    </ul>
+
+
+    <h2>Reseptit:</h2>
+
+    <ul class="recipes">
+        {% if recipe_list %}
+        {% for recipe in recipe_list %}
+        <li class="recipes-container">
+            <form action="/activate_recipe" method="POST">
+                {{ recipe.recipe_name }}
+                <input type="hidden" name="recipe_id" value="{{ recipe.recipe_id }}">
+                <button class="selectButton" type="submit">Muokkaa</button> 
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            </form>
+        </li>
+        {% endfor %}
+
+        {% else %}
+        Ei reseptejä
+        {% endif %}
+    </ul>
+</div>
+{% else %}
+
+{% endif %} 
+{% endblock %}
+   

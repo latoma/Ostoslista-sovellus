@@ -1,5 +1,12 @@
-<a href="/list"><button style="color: white; background-color: blue;">Takaisin</button></a>
+{% extends "layout.html" %}
 
+{% block title %} Listan jakaminen {% endblock %}
+
+{% block buttons %}
+<a href="/"><button style="color: white; background-color: blue;">&#60;&#60;&#60;</button></a>
+{% endblock %}
+
+{% block content %}
 <h2>Jaa lista käyttäjälle</h2>
 
 <form action="/share_list" method="POST">
@@ -17,3 +24,4 @@
     <input id="submitButton" type="submit" value="Jaa" style="color: white; background-color: green;">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <br>
+{% endblock %}
