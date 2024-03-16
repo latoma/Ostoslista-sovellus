@@ -3,6 +3,7 @@ import users
 from flask import session
 from sqlalchemy.sql import text
 
+# Adds new list to database and stores it in session
 def new(list_name):
     user_id = users.user_id()
 
@@ -12,7 +13,7 @@ def new(list_name):
                    RETURNING list_id''')
         result = db.session.execute(sql, {"list_name":list_name, 
                                           "user_id":user_id,
-                                          "created_by": users.get_username()})
+                                          "created_by": users.session_username()})
         db.session.commit()
 
         # The new list's id is saved to the session
@@ -21,6 +22,28 @@ def new(list_name):
     except:
         return False
 
+    return True
+    
+def set_session_list_id(list_id):
+    session["active_list_id"] = list_id
+
+def session_list_id():
+    return session.get("active_list_id")
+
+def delete_session_list_id():
+    if session_list_id():
+        del session["active_list_id"]
+
+# Add item to database for active list
+def add_item(item_desc):  
+    try:
+        sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
+        db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
+        db.session.commit()
+        
+    except:
+        return False
+    
     return True
 
 # Shares active list to given user_id
@@ -33,6 +56,40 @@ def share_list(username):
         return False
     return True
 
+# Removes given item_id(s) from database
+def remove_items(item_ids):
+    try:
+        sql = text("DELETE FROM list_items WHERE item_id = ANY(:item_ids)")
+        db.session.execute(sql, {"item_ids": item_ids})
+        db.session.commit()
+    except:
+        return False
+
+    return True
+
+# Returns list_name, created_by and created_at
+def get_list_info():
+    try:
+        sql = text("SELECT list_name, created_by, created_at FROM shopping_lists WHERE list_id = :list_id")
+        result = db.session.execute(sql, {"list_id" : session_list_id()})
+        list = result.fetchone()
+
+    except:
+        return None
+    
+    return list
+
+# Returns the list_items behind session list_id
+def get_items():
+    try:
+        sql = text("SELECT item_desc, item_id FROM list_items WHERE list_id = :list_id")
+        result = db.session.execute(sql, {"list_id": session_list_id()})
+        return result.fetchall()
+    except:
+        return None
+
+
+# Gives the lists that other users have shared
 def get_shared_lists():
     try:
         sql_query = text('''
@@ -51,75 +108,18 @@ def get_shared_lists():
     except:
         return None
     
-    
-# Query the database to get the usernames of users with whom the list is shared with
+# Gives the usernames of users with whom the list is shared with
 def get_shared_users():
     try:
         sql = text('SELECT username FROM shared_lists WHERE list_id = :list_id')
         result = db.session.execute(sql, {"list_id": session_list_id()})
         shared_users = [row[0] for row in result.fetchall()]
 
-        # Join the usernames into a single string separated by commas
-        shared_users_string = ", ".join(shared_users)
-
-        return shared_users_string
-    except:
-        return None
-    
-def set_session_list_id(list_id):
-    session["active_list_id"] = list_id
-
-
-def session_list_id():
-    return session.get("active_list_id")
-
-def delete_session_list_id():
-    if session_list_id():
-        del session["active_list_id"]
-
-def get_list_name_and_owner():
-    try:
-        sql = text("SELECT list_name, created_by FROM shopping_lists WHERE list_id = :list_id")
-        result = db.session.execute(sql, {"list_id" : session_list_id()})
-        list = result.fetchone()
-
-    except:
-        return None
-    
-    return list
-
-def add_item(item_desc):  
-    try:
-        sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
-        db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
-        db.session.commit()
-        
-    except:
-        return False
-    
-    return True
-
-# Returns the list_items behind session list_id
-def get_items():
-    try:
-        sql = text("SELECT item_desc, item_id FROM list_items WHERE list_id = :list_id")
-        result = db.session.execute(sql, {"list_id": session_list_id()})
-        return result.fetchall()
+        return shared_users
     except:
         return None
 
-
-# Removes given item_id(s) from database
-def remove_items(item_ids):
-    try:
-        sql = text("DELETE FROM list_items WHERE item_id = ANY(:item_ids)")
-        db.session.execute(sql, {"item_ids": item_ids})
-        db.session.commit()
-    except:
-        return False
-
-    return True
-
+# Gives all shopping lists the user has made
 def get_shopping_lists():
     try:
         sql = text("SELECT list_name, list_id FROM shopping_lists WHERE user_id =:user_id")
@@ -130,6 +130,7 @@ def get_shopping_lists():
     
     return lists
 
+# Deletes list items, sharing and the list itself from database
 def delete_list():
     list_id = session_list_id()
     user_id = users.user_id()
@@ -151,11 +152,12 @@ def delete_list():
     
     return True
 
+# Deletes user from shared users of active list
 def delete_sharing():
     try:
         sql = text("""DELETE FROM shared_lists 
                    WHERE username=:username AND list_id=:list_id""")
-        db.session.execute(sql, {"username": users.get_username(), 
+        db.session.execute(sql, {"username": users.session_username(), 
                                  "list_id": session_list_id()})
         db.session.commit()
     except:
@@ -200,7 +202,7 @@ def has_access_to_list(list_id):
         if shared_access:
             return True
         
-        return False # No access to given list was found
+        return False 
     
     except:
         return False 

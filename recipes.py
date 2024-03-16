@@ -3,6 +3,7 @@ import users
 from flask import session
 from sqlalchemy.sql import text
 
+# Adds new recipe to database and stores its id in session
 def new(recipe_name):
     user_id = users.user_id()
 
@@ -24,6 +25,11 @@ def set_session_recipe_id(recipe_id):
 def session_recipe_id():
     return session.get("active_recipe_id")
 
+def delete_session_recipe_id():
+    if session_recipe_id():
+        del session["active_recipe_id"]
+
+# Get active recipe's name
 def get_recipe_name():
     try:
         sql = text('SELECT recipe_name FROM recipes WHERE recipe_id = :recipe_id')
@@ -33,30 +39,8 @@ def get_recipe_name():
         return None
 
     return name[0] if name else None
-    
-def add_item(item_desc):    
-    try:
-        sql = text("INSERT INTO recipe_items (recipe_id, item_desc) VALUES (:recipe_id, :item_desc)")
-        db.session.execute(sql, {"recipe_id": session_recipe_id(), "item_desc": item_desc})
-        db.session.commit()
-    except:
-        return False
-    
-    return True
 
-def get_recipe_items():
-    if session_recipe_id() == 0:
-            return None
-    try:
-        sql = text('SELECT item_desc, item_id FROM recipe_items WHERE recipe_id =:recipe_id')
-        result = db.session.execute(sql, {"recipe_id": session_recipe_id()})
-        items = result.fetchall()
-    except:
-        return None
-    
-    return items
-
-# Convert the dictionary of recipes into a list of recipe dictionaries.
+# Returns all user recipes as list of recipe dictionaries
 def get_recipes_with_items():
     result = ""
     try:
@@ -79,11 +63,32 @@ def get_recipes_with_items():
         if item_desc:
             recipes[recipe_id]['recipe_items'].append({'item_desc': item_desc})
 
+    # Convert the dictionary of recipes into a list of recipe dictionaries.
     return list(recipes.values())
 
-def delete_session_recipe_id():
-    if session_recipe_id():
-        del session["active_recipe_id"]
+# Returns active recipe's items
+def get_recipe_items():
+    if session_recipe_id() == 0:
+            return None
+    try:
+        sql = text('SELECT item_desc, item_id FROM recipe_items WHERE recipe_id =:recipe_id')
+        result = db.session.execute(sql, {"recipe_id": session_recipe_id()})
+        items = result.fetchall()
+    except:
+        return None
+    
+    return items    
+
+# Adds item to active recipe
+def add_item(item_desc):    
+    try:
+        sql = text("INSERT INTO recipe_items (recipe_id, item_desc) VALUES (:recipe_id, :item_desc)")
+        db.session.execute(sql, {"recipe_id": session_recipe_id(), "item_desc": item_desc})
+        db.session.commit()
+    except:
+        return False
+    
+    return True
 
 # Delete recipe and its items from database
 def delete_recipe():
@@ -102,15 +107,15 @@ def delete_recipe():
 # Removes given list of items from database
 def remove_items(item_ids):
     try:
-        sql = text("DELETE FROM recipe_items WHERE item_id = ANY(:item_ids)")
-        db.session.execute(sql, {"item_ids": item_ids})
+        sql = text("DELETE FROM recipe_items WHERE item_id = ANY(:item_ids) AND recipe_id =:recipe_id")
+        db.session.execute(sql, {"item_ids": item_ids, "recipe_id": session_recipe_id()})
         db.session.commit()
     except:
         return False
     
     return True
 
-# Checks that user has access to recipe
+# Checks if user has access to given recipe
 def has_access_to_recipe(recipe_id):
     try:
         sql = text('''

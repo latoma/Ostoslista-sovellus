@@ -39,16 +39,7 @@ def user_id():
 def session_username():
     return session.get("username", 0)
 
-def get_username():
-    try:
-        sql = text("SELECT username FROM users WHERE user_id=:user_id")
-        result = db.session.execute(sql, {"user_Id":user_id()})
-        username = result.fetchone()
-    except:
-        return False
-    
-    return username[0]
-
+# Checks if username exists in database
 def username_in_database(username):
     try:
         sql = text('SELECT COUNT(*) FROM users WHERE username=:username')

@@ -4,15 +4,16 @@ import users, shopping_lists, recipes, secrets
 from datetime import datetime
 from functools import wraps
 
-# Performs CSRF token verification and zero-user check
+# A wrapper function:
+# Performs CSRF token verification for POST methods and validates user
 def check_user_required(view_func):
     @wraps(view_func)
     def decorated_function(*args, **kwargs):
         csrf_token = (request.form.get('csrf_token') 
               if request.method == 'POST' 
-              else request.args.get('csrf_token'))
+              else None)
 
-        if session.get('csrf_token') != csrf_token:
+        if csrf_token and session.get('csrf_token') != csrf_token:
             abort(403)
 
         if users.user_id() == 0:
@@ -37,22 +38,56 @@ def list():
     shared = shopping_lists.get_shared_users()
     if shared:
         return render_template("list.html", 
-                               list = shopping_lists.get_list_name_and_owner(),
-                               shared_to = shared, 
+                               list = shopping_lists.get_list_info(),
+                               shared_to = ",".join(shared), 
                                items = shopping_lists.get_items(), 
                                recipe_list = recipes.get_recipes_with_items())
     else:
         return render_template("list.html", 
-                               list = shopping_lists.get_list_name_and_owner(), 
+                               list = shopping_lists.get_list_info(), 
                                items = shopping_lists.get_items(), 
                                recipe_list = recipes.get_recipes_with_items())
     
-@app.route("/recipe")
-def recipe():
-    return render_template("recipe.html", 
-                           recipe_name = recipes.get_recipe_name(), 
-                           items = recipes.get_recipe_items())
+@app.route("/new_list", methods=['GET', 'POST'])
+@check_user_required
+def new_list():
+    if request.method == "GET":
+        return render_template("new_list.html")
 
+    if request.method == "POST":
+        list_name = request.form["list_name"]
+        print(len(list_name))
+        if 3 <= len(list_name) <= 40:
+            if shopping_lists.new(list_name):
+                return redirect("/list")
+            else:
+                return render_template("error.html", message="Listan muodostaminen epäonnistui")
+        else:
+            return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
+
+@app.route("/add_list_item", methods=["POST"])
+def add_item():
+    if request.method == "POST":
+        item_desc = request.form["content"]
+        if 3 <= len(item_desc) <= 40:
+            if shopping_lists.add_item(item_desc):
+                return redirect("/list")
+            else:
+                return  render_template("error.html", message="Tuotteen lisääminen ei onnistunut")
+        else:
+            return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
+
+@app.route("/remove_list_items", methods=["POST"])
+@check_user_required
+def remove_list_items():
+    if request.method == "POST":
+        removed_item_ids_string = request.form.get('removedItems')
+        if removed_item_ids_string is not None and removed_item_ids_string != "":
+            removed_item_ids = [int(x) for x in removed_item_ids_string.split(",")]
+            shopping_lists.remove_items(removed_item_ids)
+
+        return redirect("/list")
+                      
 @app.route("/activate_list", methods=['POST'])
 def activate_list():
     if request.method == "POST":
@@ -78,12 +113,15 @@ def share_list():
             message = "Et voi jakaa itsellesi!"
 
         elif not users.username_in_database(username):
-            message = f"Käyttäjää {username} ei löytynyt"
+            message = f"Käyttäjää {username} ei löytynyt!"
+
+        elif username in shopping_lists.get_shared_users():
+            message = f"Lista on jo jaettu käyttäjälle {username}!"
 
         else: 
             state = shopping_lists.share_list(username)
             if state:
-                message = f"Jakaminen käyttäjälle {username} onnistui"
+                message = f"Jakaminen käyttäjälle {username} onnistui!"
             else:
                 message = "SQL virhe"
             
@@ -91,20 +129,6 @@ def share_list():
                                success = state,
                                message = message)
         
-
-@app.route("/activate_recipe", methods=['POST'])
-@check_user_required
-def activate_recipe():
-    if request.method == 'POST':
-        recipe_id = request.form["recipe_id"]
-        if recipes.has_access_to_recipe(recipe_id):
-            recipes.set_session_recipe_id(recipe_id)
-            return redirect("/recipe")
-        else:
-            render_template("error.html", message="Ei oikeutta reseptiin",)
-
-    
-
 @app.route("/delete_list", methods=["POST"])
 @check_user_required
 def delete_list():
@@ -119,34 +143,13 @@ def delete_list():
                 return redirect("/")
         
         return render_template("error.html", message="Listan poistaminen epäonnistui")
+   
+@app.route("/recipe")
+def recipe():
+    return render_template("recipe.html", 
+                           recipe_name = recipes.get_recipe_name(), 
+                           items = recipes.get_recipe_items())
 
-@app.route("/delete_recipe", methods=["POST"])
-@check_user_required
-def delete_recipe():
-    if request.method == "POST":
-        if recipes.delete_recipe():
-            return redirect("/")
-        else:
-            return render_template("error.html", message="Reseptin poistaminen epäonnistui")
-        
-# Renders  a template either for a new shopping_list or a new recipe
-@app.route("/new_list", methods=['GET', 'POST'])
-@check_user_required
-def new_list():
-    if request.method == "GET":
-        return render_template("new_list.html", 
-                               current_date = datetime.now().strftime('%d/%m/%Y'))
-
-    if request.method == "POST":
-        list_name = request.form["list_name"]
-        if 3 <= len(list_name) <= 40:
-            if shopping_lists.new(list_name):
-                return redirect("/list")
-            else:
-                return render_template("error.html", message="Listan muodostaminen epäonnistui")
-        else:
-            return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
-        
 @app.route("/new_recipe", methods=['GET', 'POST'])
 @check_user_required
 def new_recipe():
@@ -162,20 +165,6 @@ def new_recipe():
                 return render_template("error.html", message="Reseptin muodostaminen ei onnistunut")
         else:
             return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
-            
-
-@app.route("/add_list_item", methods=["POST"])
-def add_item():
-    if request.method == "POST":
-        item_desc = request.form["content"]
-        if 3 <= len(item_desc) <= 40:
-            if shopping_lists.add_item(item_desc):
-                return redirect("/list")
-            else:
-                return  render_template("error.html", message="Tuotteen lisääminen ei onnistunut")
-        else:
-            return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
-            
         
 @app.route("/add_recipe_item", methods=["POST"])
 def add_recipe_item():
@@ -190,17 +179,6 @@ def add_recipe_item():
             return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
 
 
-@app.route("/remove_list_items", methods=["POST"])
-@check_user_required
-def remove_list_items():
-    if request.method == "POST":
-        removed_item_ids_string = request.form.get('removedItems')
-        if removed_item_ids_string is not None and removed_item_ids_string != "":
-            removed_item_ids = [int(x) for x in removed_item_ids_string.split(",")]
-            shopping_lists.remove_items(removed_item_ids)
-
-        return redirect("/list")
-    
 @app.route("/remove_recipe_items", methods=["POST"])
 @check_user_required
 def remove_recipe_items():
@@ -211,7 +189,27 @@ def remove_recipe_items():
             recipes.remove_items(removed_item_ids)
 
         return redirect("/recipe")        
+        
+@app.route("/activate_recipe", methods=['POST'])
+@check_user_required
+def activate_recipe():
+    if request.method == 'POST':
+        recipe_id = request.form["recipe_id"]
+        if recipes.has_access_to_recipe(recipe_id):
+            recipes.set_session_recipe_id(recipe_id)
+            return redirect("/recipe")
+        else:
+            render_template("error.html", message="Ei oikeutta reseptiin",)
 
+@app.route("/delete_recipe", methods=["POST"])
+@check_user_required
+def delete_recipe():
+    if request.method == "POST":
+        if recipes.delete_recipe():
+            return redirect("/")
+        else:
+            return render_template("error.html", message="Reseptin poistaminen epäonnistui")
+  
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
