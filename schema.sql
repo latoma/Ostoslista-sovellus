@@ -9,6 +9,7 @@ CREATE TABLE shopping_lists (
     list_name VARCHAR(40) NOT NULL,
     user_id INT,
     created_by VARCHAR(40),
+    created_at TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (created_by) REFERENCES users(username)
 );
