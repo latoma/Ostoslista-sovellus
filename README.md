@@ -20,7 +20,7 @@ Ostoslista-sovelluksella voi tehdä yksinkertaisia ostoslistoja ja jakaa niitä 
     - Reseptin poistaminen 
   
 
-## Sovelluksen paikallinen käynnistäminen:
+## Sovelluksen paikallinen käynnistäminen (vaatii PostgreSQL):
 
 ### Kloonaa tämä repository omalle koneellesi ja siirry sen juurikansioon.
 ```
