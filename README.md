@@ -64,4 +64,9 @@ flask run
 - Jaettujen listojen kohdalla on nyt näkyvissä juuri jaettu lista.
 - Paina "Näytä", niin voit katsella listaa ilman toiminnallisuuksia
   - (Voit halutessasi muokata sitä ja vaihtaa takaisin toiselle käyttäjälle niin näet muutokset)
-  
+
+## Käytetyt teknologiat
+- Python
+- Flask
+- PostgreSQL
+- HTML/CSS/JavaScript
