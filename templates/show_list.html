@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %} {{list.list_name}} {% endblock %}
+
+{% block buttons %}
+<a href="/"><button style="color: white; background-color: blue;">Palaa etusivulle</button></a>
+{% endblock %}
+
+{% block content %}
+<div class="list-view-container">
+    <h2>Tuotteet:</h2>
+</div>
+<br>
+<div class="item-view-container">
+    <ul class="centered-list">
+        {% for item in items %}
+            <li data-item-id="{{ item.item_id }}">
+                {{ item.item_desc }}
+            </li>
+        {% endfor %}
+    </ul>        
+</div>
+
+{% endblock %}

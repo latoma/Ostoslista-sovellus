@@ -87,16 +87,29 @@ def remove_list_items():
             shopping_lists.remove_items(removed_item_ids)
 
         return redirect("/list")
-                      
-@app.route("/activate_list", methods=['POST'])
+
+# Activates list in session
+# If GET, it just shows the list
+# If POST, it redirects to editing mode                     
+@app.route("/activate_list", methods=["GET", "POST"])
 def activate_list():
-    if request.method == "POST":
-        list_id = request.form["list_id"]
+    if request.method == "GET":
+        list_id = request.args.get('list_id')
         if shopping_lists.has_access_to_list(list_id):
             shopping_lists.set_session_list_id(list_id)
+            return render_template("show_list.html", 
+                                   list = shopping_lists.get_list_info(), 
+                                   items = shopping_lists.get_items())
+        
+    if request.method == "POST":    
+        list_id = request.form["list_id"]
+        if shopping_lists.has_access_to_list(list_id):
+            shopping_lists.set_session_list_id(list_id)            
             return redirect("/list")
-        else:
-            return render_template("error.html", message="Ei oikeutta listaan")
+    
+    return render_template("error.html", message="Ei oikeutta listaan")    
+
+
     
 @app.route("/share_list", methods=["GET", "POST"])
 @check_user_required

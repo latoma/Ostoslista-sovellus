@@ -29,14 +29,21 @@
     {% if lists %}
 
     {% for list in lists %}
-        <li>
+    <div id="list-name-index">{{ list.list_name }}</div>
+        <li class="list-selection-buttons">
             <form action="/activate_list" method="POST">
-                {{ list.list_name }}
                 <input type="hidden" name="list_id" value="{{ list.list_id }}">
                 <button class="selectButton" type="submit">Muokkaa</button> 
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             </form>
+
+            <form action="/activate_list" method="GET">
+                <input type="hidden" name="list_id" value="{{ list.list_id }}">
+                <button class="showButton" type="submit">Näytä</button> 
+            </form>
+            <br>
         </li>
+    
     {% endfor %}
 
     {% else %}
