@@ -251,6 +251,8 @@ def register():
         password2 = request.form["password2"]
         if password1 != password2:
             return render_template("error.html", message="Salasanat eroavat")
+        if users.username_in_database(username):
+            return render_template("error.html", message="Käyttäjänimi on jo käytössä")
         if users.register(username, password1):
             return redirect("/")
         else:
