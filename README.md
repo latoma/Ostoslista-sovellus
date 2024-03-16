@@ -62,5 +62,6 @@ flask run
 - Kirjaudu ulos
 - Kirjaudu sisään ensimmäisellä käyttäjällä
 - Jaettujen listojen kohdalla on nyt näkyvissä juuri jaettu lista.
+- Paina "Näytä", niin voit katsella listaa ilman toiminnallisuuksia
   - (Voit halutessasi muokata sitä ja vaihtaa takaisin toiselle käyttäjälle niin näet muutokset)
   
