@@ -25,7 +25,6 @@ Ostoslista-sovelluksella voi tehdä yksinkertaisia ostoslistoja ja jakaa niitä 
 ### Kloonaa tämä repository omalle koneellesi ja siirry sen juurikansioon.
 ```
 git clone <repository-url>
-cd shopping-list-app
 ```
 ### Luo virtuaaliympäristö
 - Luo juurikansioon `.env`-tiedoso ja määritä sen sisälö seuraavanlaiseksi:
