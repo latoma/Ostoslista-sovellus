@@ -64,6 +64,12 @@ flask run
 - Jaettujen listojen kohdalla on nyt näkyvissä juuri jaettu lista.
 - Paina "Näytä", niin voit katsella listaa ilman toiminnallisuuksia
   - (Voit halutessasi muokata sitä ja vaihtaa takaisin toiselle käyttäjälle niin näet muutokset)
+ 
+## Sovelluksen tietokannan rakenteesta
+- Käyttäjät tallennetaan users-taulukkoon hashatuilla salasanoilla
+- Ostoslistat ovat shopping_list taulukossa ja niiden tuotteet ovat list_items taulukossa list_id viittauksella
+- Rseptit ovat kuten listoja mutta vähemmillä tiedoilla. Ne ovat recipe_lists taulukossa ja niiden tuotteet ovat omassa recipe_items taulukossa recipe_id viittauksella.
+- Shared_lists säilyttää tiedon jaetuista listoista viittaamalla  ostoslistojen list_id:iin ja käyttäjien username:ihin
 
 ## Käytetyt teknologiat
 - Python
