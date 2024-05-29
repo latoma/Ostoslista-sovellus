@@ -1,6 +1,6 @@
 # Shopping list app
 
-- [Suomekielinen versiol](#ostoslista-sovellus)
+>[Suomenkielinen README](#ostoslista-sovellus)
 
 Author: Toma Lahtinen
 
@@ -24,7 +24,7 @@ The shopping list app allows you to make simple shopping lists and share them wi
     - Adding and adding new recipes, adding or deleting a recipe 
   
 
-## Start the application locally (requires PostgreSQL):
+## Start the application locally (requires PostgreSQL!):
 
 ### Clone this repository on your machine and navigate to its root folder.
 ```
@@ -81,10 +81,11 @@ flask run
 - PostgreSQL
 - HTML/CSS/JavaScript
 
-Translated with DeepL.com (free version)
+----------------------
 
 # Ostoslista-sovellus
 Tekijä: Toma Lahtinen
+
 ### Kuvaus
 Ostoslista-sovelluksella voi tehdä yksinkertaisia ostoslistoja ja jakaa niitä muiden käyttäjien kanssa. Käyttäjä voi myös tehdä omia reseptejä, joita se voi selata kätevästi ostoslistaa muokatessa.
 
