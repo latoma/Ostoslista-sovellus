@@ -37,8 +37,9 @@ def delete_session_list_id():
 # Add item to database for active list
 def add_item(item_desc):  
     try:
-        sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
-        db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
+        list_id = session_list_id()
+        sql = f"INSERT INTO list_items (list_id, item_desc) VALUES ({list_id}, '{item_desc}')"
+        db.session.execute(sql)
         db.session.commit()
         
     except:
