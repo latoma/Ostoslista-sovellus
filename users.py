@@ -3,6 +3,7 @@ from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
 import shopping_lists, recipes
+import base64
 
 def login(username, password):
     sql = text('SELECT user_id, password FROM users WHERE username=:username')
@@ -24,7 +25,10 @@ def logout():
     recipes.delete_session_recipe_id()
 
 def register(username, password):
-    hash_value = generate_password_hash(password)
+    # BAD HASHING
+    hash_value = base64.b64encode(password.encode()).decode();
+    # FIX:
+    # hash_value = generate_password_hash(password)
     try:
         sql = text("INSERT INTO users (username,password) VALUES (:username,:password)")
         db.session.execute(sql, {"username":username, "password":hash_value})
