@@ -50,8 +50,12 @@ def add_item(item_desc):
 # Shares active list to given user_id
 def share_list(username):
     try:
+        # SQL-INJECTION FLAW
         sql = text('INSERT INTO shared_lists (list_id, username) VALUES (:list_id, :username)')
         db.session.execute(sql, {"list_id": session_list_id(), "username": username})
+        # FIX (using parameterization):
+        # sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
+        # db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
         db.session.commit()
     except:
         return False
