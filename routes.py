@@ -4,24 +4,25 @@ import users, shopping_lists, recipes, secrets
 from datetime import datetime
 from functools import wraps
 
-# A wrapper function:
-# Performs CSRF token verification for POST methods and validates user
-def check_user_required(view_func):
-    @wraps(view_func)
-    def decorated_function(*args, **kwargs):
-        csrf_token = (request.form.get('csrf_token') 
-              if request.method == 'POST' 
-              else None)
+# # CSRF FIX:
+# # A wrapper function:
+# # Performs CSRF token verification for POST methods and validates user
+# def check_user_required(view_func):
+#     @wraps(view_func)
+#     def decorated_function(*args, **kwargs):
+#         csrf_token = (request.form.get('csrf_token') 
+#               if request.method == 'POST' 
+#               else None)
 
-        if csrf_token and session.get('csrf_token') != csrf_token:
-            abort(403)
+#         if csrf_token and session.get('csrf_token') != csrf_token:
+#             abort(403)
 
-        if users.user_id() == 0:
-            abort(403)
+#         if users.user_id() == 0:
+#             abort(403)
 
-        return view_func(*args, **kwargs)
+#         return view_func(*args, **kwargs)
 
-    return decorated_function
+#     return decorated_function
 
 @app.route("/")
 def index():
@@ -49,7 +50,7 @@ def list():
                                recipe_list = recipes.get_recipes_with_items())
     
 @app.route("/new_list", methods=['GET', 'POST'])
-@check_user_required
+# @check_user_required
 def new_list():
     if request.method == "GET":
         return render_template("new_list.html")
@@ -78,7 +79,7 @@ def add_item():
             return render_template("error.html", message="Nimen pituus on oltava 3-40 merkkiä pitkä")
 
 @app.route("/remove_list_items", methods=["POST"])
-@check_user_required
+# @check_user_required
 def remove_list_items():
     if request.method == "POST":
         removed_item_ids_string = request.form.get('removedItems')
@@ -112,7 +113,7 @@ def activate_list():
 
     
 @app.route("/share_list", methods=["GET", "POST"])
-@check_user_required
+# @check_user_required
 def share_list():
     if request.method == "GET":
         return render_template("share.html")
@@ -143,7 +144,7 @@ def share_list():
                                message = message)
         
 @app.route("/delete_list", methods=["POST"])
-@check_user_required
+# @check_user_required
 def delete_list():
     if request.method == "POST":
         shared = shopping_lists.get_shared_users()
@@ -164,7 +165,7 @@ def recipe():
                            items = recipes.get_recipe_items())
 
 @app.route("/new_recipe", methods=['GET', 'POST'])
-@check_user_required
+# @check_user_required
 def new_recipe():
     if request.method == "GET":
         return render_template("new_recipe.html")
@@ -193,7 +194,7 @@ def add_recipe_item():
 
 
 @app.route("/remove_recipe_items", methods=["POST"])
-@check_user_required
+# @check_user_required
 def remove_recipe_items():
     if request.method == "POST":
         removed_item_ids_string = request.form.get('removedItems')
@@ -204,7 +205,7 @@ def remove_recipe_items():
         return redirect("/recipe")        
         
 @app.route("/activate_recipe", methods=['POST'])
-@check_user_required
+# @check_user_required
 def activate_recipe():
     if request.method == 'POST':
         recipe_id = request.form["recipe_id"]
@@ -215,7 +216,7 @@ def activate_recipe():
             render_template("error.html", message="Ei oikeutta reseptiin",)
 
 @app.route("/delete_recipe", methods=["POST"])
-@check_user_required
+# @check_user_required
 def delete_recipe():
     if request.method == "POST":
         if recipes.delete_recipe():
