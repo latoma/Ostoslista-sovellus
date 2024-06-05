@@ -232,7 +232,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         if users.login(username, password):
-            session['csrf_token'] = secrets.token_hex(16)
+            # session['csrf_token'] = secrets.token_hex(16)
             return redirect("/")
         else:
             return render_template("error.html", message="Väärä tunnus tai salasana")
