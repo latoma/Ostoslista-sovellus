@@ -51,8 +51,9 @@ def add_item(item_desc):
 def share_list(username):
     try:
         # SQL-INJECTION FLAW
-        sql = text('INSERT INTO shared_lists (list_id, username) VALUES (:list_id, :username)')
-        db.session.execute(sql, {"list_id": session_list_id(), "username": username})
+        # The user inputs are inserted into the SQL query directly, which enables query manipulation.
+        sql = text(f'INSERT INTO list_items (list_id, username) VALUES ({session_list_id()}, "{username}")')
+        db.session.execute(sql)
         # FIX (using parameterization):
         # sql = text("INSERT INTO list_items (list_id, item_desc) VALUES (:list_id, :item_desc)")
         # db.session.execute(sql, {"list_id": session_list_id(), "item_desc": item_desc})
